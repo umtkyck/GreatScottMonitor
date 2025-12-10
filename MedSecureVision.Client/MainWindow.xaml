@@ -309,8 +309,8 @@
 
                         <Button Grid.Column="0" Content="Use PIN" Style="{StaticResource ModernButton}"
                                 Click="FallbackAuth_Click"/>
-                        <Button Grid.Column="2" Content="Settings" Style="{StaticResource ModernButton}"
-                                Click="Settings_Click"/>
+                        <Button Grid.Column="2" Content="Enroll Face" Style="{StaticResource ModernButton}"
+                                Click="EnrollFace_Click"/>
                     </Grid>
                 </Grid>
             </Border>

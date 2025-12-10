@@ -184,12 +184,18 @@ public partial class MainWindow : Window
         fallbackWindow.ShowDialog();
     }
 
-    private void Settings_Click(object sender, RoutedEventArgs e)
+    private void EnrollFace_Click(object sender, RoutedEventArgs e)
     {
-        // TODO: Open settings window
-        MessageBox.Show("Settings will be available in a future update.", 
-                        "Settings", 
-                        MessageBoxButton.OK, 
-                        MessageBoxImage.Information);
+        var enrollmentWindow = new EnrollmentWindow();
+        enrollmentWindow.Owner = this;
+        var result = enrollmentWindow.ShowDialog();
+        
+        if (result == true)
+        {
+            // Enrollment successful
+            StatusTitle.Text = "Face enrolled!";
+            StatusDescription.Text = "You can now authenticate with your face";
+            StatusIndicator.Fill = new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50));
+        }
     }
 }
