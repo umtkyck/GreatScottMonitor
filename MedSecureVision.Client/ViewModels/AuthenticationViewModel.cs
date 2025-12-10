@@ -54,6 +54,15 @@ public class AuthenticationViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Restarts the authentication process.
+    /// Called when service is restarted from system tray.
+    /// </summary>
+    public void RestartAuthentication()
+    {
+        _ = InitializeAsync();
+    }
+
+    /// <summary>
     /// Initialize camera and face service.
     /// </summary>
     private async Task InitializeAsync()

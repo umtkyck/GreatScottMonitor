@@ -2,6 +2,9 @@ using System.Windows;
 using System.Windows.Input;
 using MedSecureVision.Client.Services;
 
+// Resolve WPF vs WinForms ambiguities
+using MessageBox = System.Windows.MessageBox;
+
 namespace MedSecureVision.Client.Views;
 
 /// <summary>

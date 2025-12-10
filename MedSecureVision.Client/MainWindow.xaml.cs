@@ -6,6 +6,12 @@ using System.Windows.Media.Effects;
 using MedSecureVision.Client.ViewModels;
 using MedSecureVision.Client.Views;
 
+// Resolve WPF vs WinForms/System.Drawing ambiguities
+using Color = System.Windows.Media.Color;
+using ColorConverter = System.Windows.Media.ColorConverter;
+using Point = System.Windows.Point;
+using MessageBox = System.Windows.MessageBox;
+
 namespace MedSecureVision.Client;
 
 /// <summary>
