@@ -15,7 +15,6 @@ public class FaceTemplate
     public User? User { get; set; }
 
     [Required]
-    [Column(TypeName = "bytea")]
     public byte[] EncryptedTemplate { get; set; } = Array.Empty<byte>();
 
     [MaxLength(256)]

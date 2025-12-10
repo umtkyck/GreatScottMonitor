@@ -48,12 +48,19 @@ if (!string.IsNullOrEmpty(auth0Domain) && !string.IsNullOrEmpty(auth0Audience))
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (connectionString?.Contains("PostgreSQL") == true || connectionString?.Contains("postgres") == true)
+    if (connectionString?.Contains("Data Source") == true && connectionString?.Contains(".db") == true)
     {
+        // SQLite for development
+        options.UseSqlite(connectionString);
+    }
+    else if (connectionString?.Contains("Host=") == true || connectionString?.Contains("postgres") == true)
+    {
+        // PostgreSQL
         options.UseNpgsql(connectionString);
     }
     else
     {
+        // SQL Server
         options.UseSqlServer(connectionString ?? "Server=(localdb)\\mssqllocaldb;Database=MedSecureVision;Trusted_Connection=True;");
     }
 });

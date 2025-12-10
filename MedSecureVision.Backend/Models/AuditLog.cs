@@ -33,7 +33,6 @@ public class AuditLog
 
     public Guid? SessionId { get; set; }
 
-    [Column(TypeName = "jsonb")]
     public string? Metadata { get; set; } // JSON metadata
 }
 

@@ -32,7 +32,7 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.TemplateId);
             entity.HasIndex(e => e.UserId);
-            entity.Property(e => e.EncryptedTemplate).HasColumnType("bytea"); // PostgreSQL
+            // Remove database-specific column type for cross-database compatibility
             entity.HasOne(e => e.User)
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
@@ -46,7 +46,7 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.Timestamp);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.EventType);
-            entity.Property(e => e.Metadata).HasColumnType("jsonb"); // PostgreSQL
+            // Remove database-specific column type for cross-database compatibility
         });
     }
 }
