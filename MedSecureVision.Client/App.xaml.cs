@@ -18,6 +18,9 @@ public partial class App : Application
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
+                // HttpClient for backend API calls
+                services.AddHttpClient();
+                
                 // Services
                 services.AddSingleton<IFaceServiceClient, FaceServiceClient>();
                 services.AddSingleton<ICameraService, CameraService>();
@@ -25,6 +28,7 @@ public partial class App : Application
                 services.AddSingleton<IPresenceMonitorService, PresenceMonitorService>();
                 services.AddSingleton<ISessionLockService, SessionLockService>();
                 services.AddSingleton<ICloudAuthService, CloudAuthService>();
+                services.AddSingleton<IFallbackAuthService, FallbackAuthService>();
 
                 // ViewModels
                 services.AddTransient<AuthenticationViewModel>();

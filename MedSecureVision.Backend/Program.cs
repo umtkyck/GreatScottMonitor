@@ -62,7 +62,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IFaceVerificationService, FaceVerificationService>();
 builder.Services.AddScoped<IEncryptionService, EncryptionService>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
-builder.Services.AddScoped<IAuth0Service, Auth0Service>();
+
+// Add HttpClient for Auth0Service
+builder.Services.AddHttpClient<IAuth0Service, Auth0Service>(client =>
+{
+    var domain = builder.Configuration["Auth0:Domain"];
+    if (!string.IsNullOrEmpty(domain))
+    {
+        client.BaseAddress = new Uri($"https://{domain}/");
+    }
+});
 
 var app = builder.Build();
 
