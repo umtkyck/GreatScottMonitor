@@ -1,7 +1,8 @@
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Windows.Media.Imaging;
 using MedSecureVision.Shared.Models;
 using Microsoft.Extensions.Logging;
-using System.Net.Http.Json;
 using Microsoft.Extensions.Options;
 
 namespace MedSecureVision.Client.Services;

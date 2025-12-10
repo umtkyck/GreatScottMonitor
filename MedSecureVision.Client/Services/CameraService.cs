@@ -166,7 +166,7 @@ public class CameraService : ICameraService
             var bitmapData = bitmap.LockBits(
                 new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
                 ImageLockMode.ReadOnly,
-                PixelFormat.Format24bppRgb);
+                System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
             var bitmapSource = BitmapSource.Create(
                 bitmapData.Width,

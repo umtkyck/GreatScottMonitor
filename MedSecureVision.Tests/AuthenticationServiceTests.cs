@@ -1,3 +1,4 @@
+using System.Net.Http;
 using Xunit;
 using FluentAssertions;
 using Moq;

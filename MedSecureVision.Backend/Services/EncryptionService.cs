@@ -39,10 +39,10 @@ public class EncryptionService : IEncryptionService
                 var salt = DeriveSalt(userId);
                 var key = DeriveKey(masterKey, salt);
 
-                using var aes = new AesGcm(key);
                 var iv = new byte[12]; // GCM IV size
                 RandomNumberGenerator.Fill(iv);
                 var tag = new byte[16]; // GCM tag size
+                using var aes = new AesGcm(key, tag.Length);
                 var ciphertext = new byte[data.Length];
 
                 aes.Encrypt(iv, data, ciphertext, tag);
@@ -79,14 +79,13 @@ public class EncryptionService : IEncryptionService
                 var salt = DeriveSalt(userId);
                 var key = DeriveKey(masterKey, salt);
 
-                using var aes = new AesGcm(key);
-
                 // Extract IV, ciphertext, and tag
                 var iv = new byte[12];
                 Array.Copy(encryptedData, 0, iv, 0, iv.Length);
 
                 var tagSize = 16;
                 var tag = new byte[tagSize];
+                using var aes = new AesGcm(key, tagSize);
                 Array.Copy(encryptedData, encryptedData.Length - tagSize, tag, 0, tagSize);
 
                 var ciphertextLength = encryptedData.Length - iv.Length - tagSize;
