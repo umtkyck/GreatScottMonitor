@@ -82,8 +82,9 @@ public class CameraService : ICameraService, IDisposable
                 }
 
                 // Set camera properties for optimal performance
-                _videoCapture.Set(VideoCaptureProperties.FrameWidth, 1280);
-                _videoCapture.Set(VideoCaptureProperties.FrameHeight, 720);
+                // Use 4:3 aspect ratio to better match the face guide oval
+                _videoCapture.Set(VideoCaptureProperties.FrameWidth, 640);
+                _videoCapture.Set(VideoCaptureProperties.FrameHeight, 480);
                 _videoCapture.Set(VideoCaptureProperties.Fps, 30);
 
                 _currentFrame = new Mat();

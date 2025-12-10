@@ -145,8 +145,9 @@
                     
                     <Grid>
                         <!-- Camera Feed Image -->
-                        <Image Name="CameraFeed" Stretch="UniformToFill" Source="{Binding CameraFeed}"
-                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                        <Image Name="CameraFeed" Stretch="Uniform" Source="{Binding CameraFeed}"
+                               RenderOptions.BitmapScalingMode="HighQuality"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                         <!-- Vignette Overlay -->
                         <Border CornerRadius="20">
