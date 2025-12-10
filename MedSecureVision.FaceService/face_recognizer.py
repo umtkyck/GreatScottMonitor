@@ -5,7 +5,7 @@ InsightFace ArcFace face recognition wrapper
 import cv2
 import numpy as np
 import logging
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Dict
 from insightface.app import FaceAnalysis
 
 logger = logging.getLogger(__name__)

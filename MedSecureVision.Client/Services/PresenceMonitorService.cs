@@ -1,4 +1,5 @@
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using MedSecureVision.Shared.Models;
 using Microsoft.Extensions.Logging;
 
