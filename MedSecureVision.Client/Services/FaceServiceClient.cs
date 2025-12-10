@@ -138,6 +138,15 @@ public class FaceServiceClient : IFaceServiceClient
     }
 
     /// <summary>
+    /// Alias for IsConnectedAsync - checks if the face service is available.
+    /// </summary>
+    /// <returns>True if service is available, false otherwise</returns>
+    public async Task<bool> IsServiceAvailableAsync()
+    {
+        return await IsConnectedAsync();
+    }
+
+    /// <summary>
     /// Sends a message to the Python face service via named pipe.
     /// </summary>
     /// <param name="message">IPC message to send</param>

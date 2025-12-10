@@ -1,19 +1,26 @@
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using System.Drawing;
-using System.Drawing.Imaging;
+using OpenCvSharp;
 
 namespace MedSecureVision.Client.Services;
 
-public class CameraService : ICameraService
+/// <summary>
+/// Camera service that captures frames from the webcam using OpenCvSharp.
+/// Provides real-time video feed for face detection and authentication.
+/// </summary>
+public class CameraService : ICameraService, IDisposable
 {
     private readonly ILogger<CameraService> _logger;
-    private System.Drawing.Bitmap? _currentFrame;
+    private VideoCapture? _videoCapture;
+    private Mat? _currentFrame;
     private readonly object _frameLock = new();
     private DispatcherTimer? _captureTimer;
     private int _selectedCameraIndex = 0;
+    private bool _isCapturing = false;
+    private bool _disposed = false;
 
     public event EventHandler<BitmapSource>? FrameCaptured;
 
@@ -22,26 +29,78 @@ public class CameraService : ICameraService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Initialize the camera service and detect available cameras.
+    /// </summary>
     public async Task InitializeAsync()
     {
         await Task.Run(() =>
         {
-            // Check for available cameras
-            var cameras = GetAvailableCameras();
-            if (cameras.Count == 0)
+            try
             {
-                _logger.LogWarning("No cameras found");
-                throw new InvalidOperationException("No cameras available");
-            }
+                // Try to find available cameras
+                var cameras = GetAvailableCameras();
+                if (cameras.Count == 0)
+                {
+                    _logger.LogWarning("No cameras found");
+                    throw new InvalidOperationException("No cameras available");
+                }
 
-            _selectedCameraIndex = cameras[0].Index;
-            _logger.LogInformation($"Initialized camera service with {cameras.Count} camera(s)");
+                _selectedCameraIndex = cameras[0].Index;
+                _logger.LogInformation($"Initialized camera service with {cameras.Count} camera(s)");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error initializing camera service");
+                throw;
+            }
         });
     }
 
+    /// <summary>
+    /// Start capturing frames from the selected camera.
+    /// </summary>
     public async Task StartCaptureAsync()
     {
+        if (_isCapturing)
+        {
+            _logger.LogWarning("Camera is already capturing");
+            return;
+        }
+
         await Task.Run(() =>
+        {
+            try
+            {
+                // Initialize video capture
+                _videoCapture = new VideoCapture(_selectedCameraIndex);
+                
+                if (!_videoCapture.IsOpened())
+                {
+                    _logger.LogError($"Failed to open camera at index {_selectedCameraIndex}");
+                    throw new InvalidOperationException($"Failed to open camera {_selectedCameraIndex}");
+                }
+
+                // Set camera properties for optimal performance
+                _videoCapture.Set(VideoCaptureProperties.FrameWidth, 1280);
+                _videoCapture.Set(VideoCaptureProperties.FrameHeight, 720);
+                _videoCapture.Set(VideoCaptureProperties.Fps, 30);
+
+                _currentFrame = new Mat();
+                _isCapturing = true;
+
+                _logger.LogInformation($"Camera {_selectedCameraIndex} opened successfully at " +
+                    $"{_videoCapture.Get(VideoCaptureProperties.FrameWidth)}x{_videoCapture.Get(VideoCaptureProperties.FrameHeight)}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error starting camera capture");
+                throw;
+            }
+        });
+
+        // Start capture timer on UI thread
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             _captureTimer = new DispatcherTimer
             {
@@ -49,84 +108,161 @@ public class CameraService : ICameraService
             };
             _captureTimer.Tick += OnCaptureTimerTick;
             _captureTimer.Start();
-            _logger.LogInformation("Camera capture started");
+            _logger.LogInformation("Camera capture timer started");
         });
     }
 
+    /// <summary>
+    /// Stop capturing frames and release camera resources.
+    /// </summary>
     public Task StopCaptureAsync()
     {
-        _captureTimer?.Stop();
-        _captureTimer = null;
+        _isCapturing = false;
+
+        System.Windows.Application.Current?.Dispatcher.Invoke(() =>
+        {
+            _captureTimer?.Stop();
+            _captureTimer = null;
+        });
+
+        lock (_frameLock)
+        {
+            _currentFrame?.Dispose();
+            _currentFrame = null;
+        }
+
+        _videoCapture?.Release();
+        _videoCapture?.Dispose();
+        _videoCapture = null;
+
         _logger.LogInformation("Camera capture stopped");
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Get the current frame as a BitmapSource for display.
+    /// </summary>
     public async Task<BitmapSource?> GetCurrentFrameAsync()
     {
         return await Task.Run(() =>
         {
             lock (_frameLock)
             {
-                if (_currentFrame == null)
+                if (_currentFrame == null || _currentFrame.Empty())
                     return null;
 
-                return ConvertBitmapToBitmapSource(_currentFrame);
+                try
+                {
+                    return MatToBitmapSource(_currentFrame);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error converting frame to BitmapSource");
+                    return null;
+                }
             }
         });
     }
 
+    /// <summary>
+    /// Get list of available cameras on the system.
+    /// </summary>
     public List<CameraInfo> GetAvailableCameras()
     {
         var cameras = new List<CameraInfo>();
-        
-        // Try to enumerate cameras (simplified - in production use DirectShow or MediaFoundation)
-        for (int i = 0; i < 10; i++)
+
+        // Try to enumerate cameras (check first 5 indices)
+        for (int i = 0; i < 5; i++)
         {
             try
             {
-                using var capture = new System.Drawing.Bitmap(640, 480);
-                // In production, use actual camera enumeration
-                cameras.Add(new CameraInfo
+                using var testCapture = new VideoCapture(i);
+                if (testCapture.IsOpened())
                 {
-                    Index = i,
-                    Name = $"Camera {i}",
-                    IsAvailable = true
-                });
+                    var width = testCapture.Get(VideoCaptureProperties.FrameWidth);
+                    var height = testCapture.Get(VideoCaptureProperties.FrameHeight);
+                    
+                    cameras.Add(new CameraInfo
+                    {
+                        Index = i,
+                        Name = $"Camera {i} ({width}x{height})",
+                        IsAvailable = true
+                    });
+                    
+                    _logger.LogInformation($"Found camera {i}: {width}x{height}");
+                    testCapture.Release();
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                break;
+                _logger.LogDebug($"Camera {i} not available: {ex.Message}");
             }
         }
 
         return cameras;
     }
 
+    /// <summary>
+    /// Select a different camera by index.
+    /// </summary>
     public void SelectCamera(int cameraIndex)
     {
-        _selectedCameraIndex = cameraIndex;
-        _logger.LogInformation($"Selected camera {cameraIndex}");
+        if (_selectedCameraIndex != cameraIndex)
+        {
+            _selectedCameraIndex = cameraIndex;
+            _logger.LogInformation($"Selected camera {cameraIndex}");
+
+            // If currently capturing, restart with new camera
+            if (_isCapturing)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await StopCaptureAsync();
+                    await StartCaptureAsync();
+                });
+            }
+        }
     }
 
+    /// <summary>
+    /// Capture timer tick - reads a frame from the camera.
+    /// </summary>
     private void OnCaptureTimerTick(object? sender, EventArgs e)
     {
+        if (!_isCapturing || _videoCapture == null || !_videoCapture.IsOpened())
+            return;
+
         try
         {
-            var frame = CaptureFrame();
-            if (frame != null)
+            var frame = new Mat();
+            
+            if (_videoCapture.Read(frame) && !frame.Empty())
             {
+                // Flip horizontally for mirror effect (like a selfie camera)
+                Cv2.Flip(frame, frame, FlipMode.Y);
+
                 lock (_frameLock)
                 {
                     _currentFrame?.Dispose();
-                    _currentFrame = frame;
+                    _currentFrame = frame.Clone();
                 }
 
-                var bitmapSource = ConvertBitmapToBitmapSource(frame);
-                if (bitmapSource != null)
+                // Convert to BitmapSource and raise event
+                try
                 {
-                    FrameCaptured?.Invoke(this, bitmapSource);
+                    var bitmapSource = MatToBitmapSource(frame);
+                    if (bitmapSource != null)
+                    {
+                        FrameCaptured?.Invoke(this, bitmapSource);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error converting frame for event");
                 }
             }
+            
+            frame.Dispose();
         }
         catch (Exception ex)
         {
@@ -134,60 +270,78 @@ public class CameraService : ICameraService
         }
     }
 
-    private System.Drawing.Bitmap? CaptureFrame()
+    /// <summary>
+    /// Convert OpenCV Mat to WPF BitmapSource.
+    /// </summary>
+    private BitmapSource? MatToBitmapSource(Mat mat)
     {
-        // Simplified frame capture - in production use DirectShow/MediaFoundation
-        // For now, return a placeholder
-        try
-        {
-            // This is a placeholder - actual implementation would use camera API
-            var bitmap = new System.Drawing.Bitmap(640, 480);
-            using (var g = System.Drawing.Graphics.FromImage(bitmap))
-            {
-                g.Clear(System.Drawing.Color.Black);
-                g.DrawString("Camera Feed", 
-                    new System.Drawing.Font("Arial", 20), 
-                    System.Drawing.Brushes.White, 
-                    new System.Drawing.PointF(200, 200));
-            }
-            return bitmap;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error capturing frame from camera");
+        if (mat == null || mat.Empty())
             return null;
-        }
-    }
 
-    private BitmapSource? ConvertBitmapToBitmapSource(System.Drawing.Bitmap bitmap)
-    {
         try
         {
-            var bitmapData = bitmap.LockBits(
-                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                ImageLockMode.ReadOnly,
-                System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            // Convert to BGR if necessary
+            Mat displayMat = mat;
+            if (mat.Channels() == 1)
+            {
+                displayMat = new Mat();
+                Cv2.CvtColor(mat, displayMat, ColorConversionCodes.GRAY2BGR);
+            }
+            else if (mat.Channels() == 4)
+            {
+                displayMat = new Mat();
+                Cv2.CvtColor(mat, displayMat, ColorConversionCodes.BGRA2BGR);
+            }
+
+            int width = displayMat.Width;
+            int height = displayMat.Height;
+            int stride = width * 3; // BGR = 3 bytes per pixel
+            
+            // Ensure stride is aligned to 4 bytes for WPF
+            stride = (stride + 3) & ~3;
+
+            byte[] pixels = new byte[height * stride];
+            
+            // Copy pixel data row by row
+            for (int y = 0; y < height; y++)
+            {
+                Marshal.Copy(displayMat.Ptr(y), pixels, y * stride, width * 3);
+            }
 
             var bitmapSource = BitmapSource.Create(
-                bitmapData.Width,
-                bitmapData.Height,
-                bitmap.HorizontalResolution,
-                bitmap.VerticalResolution,
+                width, height,
+                96, 96, // DPI
                 PixelFormats.Bgr24,
                 null,
-                bitmapData.Scan0,
-                bitmapData.Stride * bitmapData.Height,
-                bitmapData.Stride);
+                pixels,
+                stride);
 
-            bitmap.UnlockBits(bitmapData);
             bitmapSource.Freeze();
+
+            if (displayMat != mat)
+            {
+                displayMat.Dispose();
+            }
+
             return bitmapSource;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error converting bitmap to BitmapSource");
+            _logger.LogError(ex, "Error in MatToBitmapSource");
             return null;
         }
     }
-}
 
+    /// <summary>
+    /// Dispose resources.
+    /// </summary>
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            _disposed = true;
+            StopCaptureAsync().Wait();
+            GC.SuppressFinalize(this);
+        }
+    }
+}
