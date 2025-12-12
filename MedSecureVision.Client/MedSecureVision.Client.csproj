@@ -9,6 +9,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>MedSecureVision.Client</AssemblyName>
     <RootNamespace>MedSecureVision.Client</RootNamespace>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
     <Version>1.0.0</Version>
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
