@@ -303,14 +303,18 @@
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Column="0" Content="Use PIN" Style="{StaticResource ModernButton}"
-                                Click="FallbackAuth_Click"/>
-                        <Button Grid.Column="2" Content="Enroll Face" Style="{StaticResource ModernButton}"
-                                Click="EnrollFace_Click"/>
+                        <Button Grid.Column="0" Content="📊 Dashboard" Style="{StaticResource ModernButton}"
+                                Click="Dashboard_Click" FontSize="12"/>
+                        <Button Grid.Column="2" Content="👤 Enroll" Style="{StaticResource PrimaryButton}"
+                                Click="EnrollFace_Click" FontSize="12"/>
+                        <Button Grid.Column="4" Content="🔑 PIN" Style="{StaticResource ModernButton}"
+                                Click="FallbackAuth_Click" FontSize="12"/>
                     </Grid>
                 </Grid>
             </Border>
