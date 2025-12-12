@@ -68,13 +68,16 @@ public partial class DashboardWindow : Window
 
     private void AddNewFace_Click(object sender, RoutedEventArgs e)
     {
-        var enrollmentWindow = new EnrollmentWindow();
+        // Use Apple-style enrollment window
+        var enrollmentWindow = new AppleStyleEnrollmentWindow();
         enrollmentWindow.Owner = this;
         
         if (enrollmentWindow.ShowDialog() == true)
         {
             LoadEnrolledFaces();
             UpdateStatistics();
+            MessageBox.Show("Face ID has been set up successfully!", "Success", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 
@@ -101,7 +104,8 @@ public partial class DashboardWindow : Window
             {
                 DoDeleteFace(face.Id);
                 
-                var enrollmentWindow = new EnrollmentWindow();
+                // Use Apple-style enrollment
+                var enrollmentWindow = new AppleStyleEnrollmentWindow();
                 enrollmentWindow.Owner = this;
                 enrollmentWindow.ShowDialog();
                 

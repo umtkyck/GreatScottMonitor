@@ -323,7 +323,8 @@ public partial class MainWindow : System.Windows.Window, IDisposable
         // Stop main camera while enrolling
         StopCamera();
         
-        var enrollmentWindow = new EnrollmentWindow();
+        // Use Apple-style enrollment window
+        var enrollmentWindow = new AppleStyleEnrollmentWindow();
         enrollmentWindow.Owner = this;
         var result = enrollmentWindow.ShowDialog();
         
@@ -332,9 +333,10 @@ public partial class MainWindow : System.Windows.Window, IDisposable
         
         if (result == true)
         {
-            StatusTitle.Text = "Face enrolled!";
-            StatusDescription.Text = "You can now authenticate with your face";
+            StatusTitle.Text = "Face ID Set Up!";
+            StatusDescription.Text = "You can now use Face ID to authenticate";
             StatusIndicator.Fill = new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50));
+            UpdateFaceGuideColor("#3FB950");
         }
     }
 
