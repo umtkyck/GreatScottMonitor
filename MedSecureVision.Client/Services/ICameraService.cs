@@ -20,3 +20,4 @@ public class CameraInfo
     public bool IsAvailable { get; set; }
 }
 
+

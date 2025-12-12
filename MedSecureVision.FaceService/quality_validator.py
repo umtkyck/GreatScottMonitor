@@ -233,3 +233,4 @@ class QualityValidator:
             "score": float(score)
         }
 
+

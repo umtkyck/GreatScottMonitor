@@ -337,3 +337,4 @@ class IpcServer:
             logger.error(f"Error calculating quality score: {e}")
             return 0.5  # Default medium quality
 
+

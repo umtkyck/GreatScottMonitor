@@ -318,3 +318,4 @@ internal class DarkColorTable : ProfessionalColorTable
     public override Color SeparatorLight => Color.FromArgb(48, 54, 61);
 }
 
+

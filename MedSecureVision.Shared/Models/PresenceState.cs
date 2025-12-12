@@ -17,3 +17,4 @@ public class PresenceCheckResult
     public int FaceCount { get; set; }
 }
 
+

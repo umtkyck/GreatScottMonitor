@@ -42,3 +42,4 @@ Write-Host "[OK] Face Service stopped" -ForegroundColor Green
 Write-Host ""
 Write-Host "[INFO] All services stopped" -ForegroundColor Green
 
+

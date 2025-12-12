@@ -15,3 +15,4 @@ public class FaceComparisonResult
     public float Threshold { get; set; } = 0.6f;
 }
 
+

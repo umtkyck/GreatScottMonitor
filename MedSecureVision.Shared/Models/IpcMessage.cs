@@ -34,3 +34,4 @@ public static class IpcCommands
     public const string EnrollCapture = "ENROLL_CAPTURE";
 }
 
+

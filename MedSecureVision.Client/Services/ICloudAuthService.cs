@@ -9,3 +9,4 @@ public interface ICloudAuthService
     bool IsAuthenticated { get; }
 }
 
+

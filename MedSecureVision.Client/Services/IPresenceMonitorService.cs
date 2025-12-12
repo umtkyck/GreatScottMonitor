@@ -11,3 +11,4 @@ public interface IPresenceMonitorService
     TimeSpan? AbsenceDuration { get; }
 }
 
+

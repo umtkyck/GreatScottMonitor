@@ -9,3 +9,4 @@ public interface IAuthenticationService
     Task<EnrollmentResponse> EnrollAsync(string userId, List<BitmapSource> frames);
 }
 
+

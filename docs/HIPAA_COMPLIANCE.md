@@ -222,3 +222,4 @@ For HIPAA compliance questions or security incidents, contact:
 - Security Team: security@medsecurevision.com
 - Compliance Officer: compliance@medsecurevision.com
 
+

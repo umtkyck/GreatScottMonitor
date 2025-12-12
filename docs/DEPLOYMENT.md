@@ -228,3 +228,4 @@ Deploy the `build` folder to a web server (IIS, Nginx, Azure Static Web Apps, et
 - Set up alarms for errors
 - Monitor API Gateway metrics
 
+
