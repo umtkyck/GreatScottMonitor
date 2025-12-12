@@ -162,22 +162,47 @@ public partial class DashboardWindow : Window
     /// </summary>
     private void DeleteFace_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is EnrolledFaceModel face)
+        try
         {
-            var result = MessageBox.Show(
-                $"Delete enrollment for {face.Name}?\n\nThis action cannot be undone.",
-                "Delete Enrollment",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
-
-            if (result == MessageBoxResult.Yes)
+            if (sender is Button button && button.Tag is EnrolledFaceModel face)
             {
-                DeleteFaceData(face.Id);
-                EnrolledFaces.Remove(face);
-                UpdateStatistics();
-                UpdateUIVisibility();
-                ShowNotification("Enrollment deleted", NotificationType.Info);
+                var result = MessageBox.Show(
+                    $"Delete enrollment for {face.Name}?\n\nThis action cannot be undone.",
+                    "Delete Enrollment",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    // Delete the file first
+                    DeleteFaceData(face.Id);
+                    
+                    // Update UI on dispatcher thread
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        try
+                        {
+                            EnrolledFaces.Remove(face);
+                            FacesGrid.ItemsSource = null;
+                            FacesGrid.ItemsSource = EnrolledFaces;
+                            UpdateStatistics();
+                            UpdateUIVisibility();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"UI update error: {ex.Message}");
+                        }
+                    }));
+                    
+                    MessageBox.Show("Enrollment deleted successfully.", "Deleted", 
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error deleting enrollment: {ex.Message}", "Error", 
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
