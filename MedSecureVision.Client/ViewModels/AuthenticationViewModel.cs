@@ -5,6 +5,7 @@ using System.Windows.Threading;
 using MedSecureVision.Client.Services;
 using MedSecureVision.Shared.Models;
 using Microsoft.Extensions.Logging;
+using System.IO;
 
 namespace MedSecureVision.Client.ViewModels;
 
@@ -28,9 +29,17 @@ public class AuthenticationViewModel : INotifyPropertyChanged
     private bool _showSuccessCheckmark = false;
     private bool _isCameraInitialized = false;
     private bool _isFaceServiceAvailable = false;
+    private bool _hasEnrolledFaces = false;
+    
+    // Security & Lockout
+    private int _failedAttempts = 0;
+    private const int MaxFailedAttempts = 5;
+    private bool _isLockedOut = false;
 
     public event EventHandler<string>? AuthenticationStateChanged;
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public string AppVersion => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
 
     public AuthenticationViewModel(
         IFaceServiceClient faceServiceClient,
@@ -49,8 +58,23 @@ public class AuthenticationViewModel : INotifyPropertyChanged
         };
         _detectionTimer.Tick += OnDetectionTimerTick;
         
+        // Check for enrollment on startup
+        CheckEnrollment();
+
         // Initialize asynchronously
         _ = InitializeAsync();
+    }
+
+    /// <summary>
+    /// Checks if any faces are enrolled.
+    /// </summary>
+    private void CheckEnrollment()
+    {
+        var enrollmentPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "MedSecureVision", "enrollment.dat");
+        
+        _hasEnrolledFaces = File.Exists(enrollmentPath);
     }
 
     /// <summary>
@@ -59,6 +83,9 @@ public class AuthenticationViewModel : INotifyPropertyChanged
     /// </summary>
     public void RestartAuthentication()
     {
+        _failedAttempts = 0;
+        _isLockedOut = false;
+        CheckEnrollment();
         _ = InitializeAsync();
     }
 
@@ -69,6 +96,19 @@ public class AuthenticationViewModel : INotifyPropertyChanged
     {
         try
         {
+            if (_isLockedOut)
+            {
+                StatusMessage = "Biometrics locked. Use PIN.";
+                return;
+            }
+
+            if (!_hasEnrolledFaces)
+            {
+                StatusMessage = "No faces enrolled.";
+                AuthenticationState = "NotEnrolled";
+                return;
+            }
+
             StatusMessage = "Initializing camera...";
             
             // Initialize camera
@@ -189,8 +229,23 @@ public class AuthenticationViewModel : INotifyPropertyChanged
     /// </summary>
     private async void OnDetectionTimerTick(object? sender, EventArgs e)
     {
+        if (_isLockedOut)
+        {
+            AuthenticationState = "LockedOut";
+            StatusMessage = "Biometrics locked out.";
+            _detectionTimer.Stop();
+            return;
+        }
+
         if (AuthenticationState == "Success" || AuthenticationState == "Verifying")
             return;
+
+        if (!_hasEnrolledFaces)
+        {
+            AuthenticationState = "NotEnrolled";
+            StatusMessage = "No faces enrolled";
+            return;
+        }
 
         if (!_isCameraInitialized)
         {
@@ -271,22 +326,34 @@ public class AuthenticationViewModel : INotifyPropertyChanged
             
             if (authResult.Success)
             {
+                _failedAttempts = 0; // Reset failures on success
                 AuthenticationState = "Success";
                 StatusMessage = $"Welcome, {authResult.UserName}!";
                 ShowSuccessCheckmark = true;
                 
                 // Transition after delay
                 await Task.Delay(2000);
-                // TODO: Navigate to main application or close window
             }
             else
             {
+                _failedAttempts++;
                 AuthenticationState = "Failure";
                 StatusMessage = authResult.Error ?? "Face not recognized";
-                await Task.Delay(2000);
-                AuthenticationState = "Searching";
-                StatusMessage = "Please try again";
-                ScanningLineVisible = true;
+                
+                if (_failedAttempts >= MaxFailedAttempts)
+                {
+                    _isLockedOut = true;
+                    StatusMessage = "Too many attempts. Use PIN.";
+                    _detectionTimer.Stop();
+                    // Don't restart searching loop
+                }
+                else
+                {
+                    await Task.Delay(2000);
+                    AuthenticationState = "Searching";
+                    StatusMessage = "Please try again";
+                    ScanningLineVisible = true;
+                }
             }
         }
         catch (Exception ex)

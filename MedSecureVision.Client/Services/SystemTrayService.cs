@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Forms;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
+using MedSecureVision.Client.Views;
 
 namespace MedSecureVision.Client.Services;
 
@@ -238,7 +239,7 @@ public class SystemTrayService : IDisposable
     {
         Application.Current.Dispatcher.Invoke(() =>
         {
-            var enrollmentWindow = new Views.EnrollmentWindow();
+            var enrollmentWindow = new AppleStyleEnrollmentWindow();
             if (enrollmentWindow.ShowDialog() == true)
             {
                 SetEnrollmentStatus(true);

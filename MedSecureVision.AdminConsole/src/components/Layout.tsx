@@ -50,6 +50,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <button onClick={() => logout({ returnTo: window.location.origin })}>
             Logout
           </button>
+          <div className="version-info" style={{ marginTop: '1rem', fontSize: '0.75rem', color: '#666', textAlign: 'center', opacity: 0.7 }}>
+            v1.0.0
+          </div>
         </div>
       </nav>
       <main className="main-content">

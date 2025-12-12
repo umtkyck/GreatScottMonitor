@@ -16,14 +16,7 @@
             <Storyboard x:Key="PulseAnimation" RepeatBehavior="Forever">
                 <DoubleAnimation Storyboard.TargetName="FaceGuideGlow" 
                                  Storyboard.TargetProperty="Opacity"
-                                 From="0.3" To="0.8" Duration="0:0:1.5" AutoReverse="True">
-                    <DoubleAnimation.EasingFunction>
-                        <SineEase EasingMode="EaseInOut"/>
-                    </DoubleAnimation.EasingFunction>
-                </DoubleAnimation>
-                <DoubleAnimation Storyboard.TargetName="OuterRing" 
-                                 Storyboard.TargetProperty="Opacity"
-                                 From="0.2" To="0.5" Duration="0:0:1.5" AutoReverse="True">
+                                 From="0.2" To="0.6" Duration="0:0:2" AutoReverse="True">
                     <DoubleAnimation.EasingFunction>
                         <SineEase EasingMode="EaseInOut"/>
                     </DoubleAnimation.EasingFunction>
@@ -34,22 +27,14 @@
             <Storyboard x:Key="ScanAnimation" RepeatBehavior="Forever">
                 <DoubleAnimation Storyboard.TargetName="ScanLine" 
                                  Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
-                                 From="-120" To="120" Duration="0:0:2">
+                                 From="-120" To="120" Duration="0:0:3">
                     <DoubleAnimation.EasingFunction>
                         <SineEase EasingMode="EaseInOut"/>
                     </DoubleAnimation.EasingFunction>
                 </DoubleAnimation>
-            </Storyboard>
-
-            <!-- Rotate Animation for Loading -->
-            <Storyboard x:Key="RotateAnimation" RepeatBehavior="Forever">
-                <DoubleAnimation Storyboard.TargetName="LoadingRing" 
-                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
-                                 From="0" To="360" Duration="0:0:1.5">
-                    <DoubleAnimation.EasingFunction>
-                        <CubicEase EasingMode="EaseInOut"/>
-                    </DoubleAnimation.EasingFunction>
-                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetName="ScanLine" 
+                                 Storyboard.TargetProperty="Opacity"
+                                 From="0.8" To="0.2" Duration="0:0:3" AutoReverse="True"/>
             </Storyboard>
         </ResourceDictionary>
     </Window.Resources>
@@ -58,7 +43,6 @@
         <EventTrigger RoutedEvent="Window.Loaded">
             <BeginStoryboard Storyboard="{StaticResource PulseAnimation}"/>
             <BeginStoryboard Storyboard="{StaticResource ScanAnimation}"/>
-            <BeginStoryboard Storyboard="{StaticResource RotateAnimation}"/>
         </EventTrigger>
     </Window.Triggers>
 
@@ -67,12 +51,11 @@
         <Border.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                 <GradientStop Color="#0D1117" Offset="0"/>
-                <GradientStop Color="#161B22" Offset="0.4"/>
-                <GradientStop Color="#0D1117" Offset="1"/>
+                <GradientStop Color="#161B22" Offset="1"/>
             </LinearGradientBrush>
         </Border.Background>
         <Border.Effect>
-            <DropShadowEffect BlurRadius="40" ShadowDepth="0" Opacity="0.8" Color="#000000"/>
+            <DropShadowEffect BlurRadius="40" ShadowDepth="10" Opacity="0.6" Color="#000000"/>
         </Border.Effect>
 
         <Grid>
@@ -93,239 +76,136 @@
 
                 <!-- Logo and Title -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <!-- Shield Icon -->
-                    <Border Width="36" Height="36" CornerRadius="10" Margin="0,0,12,0">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#58A6FF" Offset="0"/>
-                                <GradientStop Color="#A371F7" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Path Data="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M17.13,17C15.92,18.85 14.11,20.24 12,20.92C9.89,20.24 8.08,18.85 6.87,17C6.53,16.5 6.24,16 6,15.47C6,13.82 8.71,12.47 12,12.47C15.29,12.47 18,13.79 18,15.47C17.76,16 17.47,16.5 17.13,17Z"
-                              Fill="White" Stretch="Uniform" Width="20" Height="20"
+                    <Border Width="32" Height="32" CornerRadius="10" Margin="0,0,12,0" Background="#21262D">
+                        <Path Data="M12,2 L22,6 L22,12 C22,17 17,21 12,22 C7,21 2,17 2,12 L2,6 L12,2 Z"
+                              Fill="#58A6FF" Stretch="Uniform" Width="18" Height="18"
                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="MedSecure" FontSize="18" FontWeight="SemiBold" 
+                        <TextBlock Text="MedSecure" FontSize="16" FontWeight="SemiBold" 
                                    Foreground="#F0F6FC" FontFamily="Segoe UI Variable"/>
-                        <TextBlock Text="Vision" FontSize="10" FontWeight="Light" 
-                                   Foreground="#8B949E" Margin="0,-2,0,0" FontFamily="Segoe UI Variable"/>
+                        <TextBlock Text="Vision Access" FontSize="11" FontWeight="Light" 
+                                   Foreground="#8B949E" Margin="0,-2,0,0"/>
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Window Controls -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <!-- Minimize -->
                     <Button Style="{StaticResource IconButton}" Click="MinimizeButton_Click" ToolTip="Minimize">
-                        <Path Data="M20,14H4V10H20" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" 
-                              Width="12" Height="12" Stretch="Uniform"/>
+                        <Path Data="M19,13H5V11H19V13Z" Fill="#8B949E" Width="10" Height="10" Stretch="Uniform"/>
                     </Button>
-                    <!-- Close -->
-                    <Button Style="{StaticResource IconButton}" Click="CloseButton_Click" ToolTip="Close">
+                    <Button Style="{StaticResource IconButton}" Click="CloseButton_Click" ToolTip="Close" Margin="8,0,0,0">
                         <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" 
-                              Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" 
-                              Width="12" Height="12" Stretch="Uniform"/>
+                              Fill="#8B949E" Width="10" Height="10" Stretch="Uniform"/>
                     </Button>
                 </StackPanel>
             </Grid>
 
             <!-- ═══════════════════════════════════════════════════════════════
-                 MAIN CONTENT - FACE RECOGNITION AREA
+                 MAIN CONTENT - CIRCULAR CAMERA FEED
             ═══════════════════════════════════════════════════════════════ -->
             <Grid Grid.Row="1" Margin="32,24,32,24">
                 
-                <!-- Camera Feed Background -->
-                <Border CornerRadius="20" ClipToBounds="True">
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Color="#1C2128" Offset="0"/>
-                            <GradientStop Color="#0D1117" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Border.Background>
+                <!-- Circular Camera Mask -->
+                <Grid Width="320" Height="320" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid.OpacityMask>
+                        <VisualBrush>
+                            <VisualBrush.Visual>
+                                <Ellipse Width="320" Height="320" Fill="Black"/>
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Grid.OpacityMask>
+
+                    <!-- Background when no camera -->
+                    <Border Background="#1C2128"/>
+
+                    <!-- Camera Feed -->
+                    <Image Name="CameraFeed" Stretch="UniformToFill" Source="{Binding CameraFeed}"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     
-                    <Grid>
-                        <!-- Camera Feed Image -->
-                        <Image Name="CameraFeed" Stretch="Uniform" Source="{Binding CameraFeed}"
-                               RenderOptions.BitmapScalingMode="HighQuality"
-                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <!-- Scan Line Overlay -->
+                    <Rectangle x:Name="ScanLine" Width="320" Height="4" VerticalAlignment="Center"
+                               Visibility="{Binding ScanningLineVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#0058A6FF" Offset="0"/>
+                                <GradientStop Color="#58A6FF" Offset="0.5"/>
+                                <GradientStop Color="#0058A6FF" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                        <Rectangle.RenderTransform>
+                            <TranslateTransform Y="0"/>
+                        </Rectangle.RenderTransform>
+                    </Rectangle>
+                </Grid>
 
-                        <!-- Vignette Overlay -->
-                        <Border CornerRadius="20">
-                            <Border.Background>
-                                <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
-                                    <GradientStop Color="#00000000" Offset="0.3"/>
-                                    <GradientStop Color="#80000000" Offset="1"/>
-                                </RadialGradientBrush>
-                            </Border.Background>
-                        </Border>
+                <!-- Outer Glow Ring -->
+                <Ellipse x:Name="FaceGuideGlow" Width="340" Height="340" 
+                         HorizontalAlignment="Center" VerticalAlignment="Center"
+                         StrokeThickness="0">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#2058A6FF" Offset="0.8"/>
+                            <GradientStop Color="Transparent" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
 
-                        <!-- Face Guide Container -->
-                        <Canvas HorizontalAlignment="Center" VerticalAlignment="Center" Width="260" Height="320">
-                            
-                            <!-- Outer Glow Ring -->
-                            <Ellipse x:Name="FaceGuideGlow" Width="280" Height="340" 
-                                     Canvas.Left="-10" Canvas.Top="-10"
-                                     Opacity="0.5">
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
-                                        <GradientStop Color="#3058A6FF" Offset="0.7"/>
-                                        <GradientStop Color="#0058A6FF" Offset="1"/>
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
-                            </Ellipse>
+                <!-- Static Border Ring -->
+                <Ellipse Width="320" Height="320" HorizontalAlignment="Center" VerticalAlignment="Center"
+                         Stroke="#30363D" StrokeThickness="2"/>
 
-                            <!-- Outer Ring (Animated) -->
-                            <Ellipse x:Name="OuterRing" Width="270" Height="330" 
-                                     Canvas.Left="-5" Canvas.Top="-5"
-                                     Stroke="#58A6FF" StrokeThickness="1" 
-                                     Fill="Transparent" Opacity="0.3"
-                                     StrokeDashArray="2,4"/>
-
-                            <!-- Main Face Guide Ellipse -->
-                            <Ellipse x:Name="FaceGuide" Width="260" Height="320"
-                                     StrokeThickness="3" Fill="Transparent">
-                                <Ellipse.Stroke>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#58A6FF" Offset="0"/>
-                                        <GradientStop Color="#A371F7" Offset="0.5"/>
-                                        <GradientStop Color="#58A6FF" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Ellipse.Stroke>
-                                <Ellipse.Effect>
-                                    <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.6" Color="#58A6FF"/>
-                                </Ellipse.Effect>
-                            </Ellipse>
-
-                            <!-- Corner Markers -->
-                            <!-- Top Left -->
-                            <Path Data="M 30,0 L 0,0 L 0,30" Stroke="#58A6FF" StrokeThickness="3" 
-                                  Canvas.Left="20" Canvas.Top="20" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                            <!-- Top Right -->
-                            <Path Data="M 0,0 L 30,0 L 30,30" Stroke="#58A6FF" StrokeThickness="3" 
-                                  Canvas.Left="210" Canvas.Top="20" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                            <!-- Bottom Left -->
-                            <Path Data="M 0,0 L 0,30 L 30,30" Stroke="#A371F7" StrokeThickness="3" 
-                                  Canvas.Left="20" Canvas.Top="270" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                            <!-- Bottom Right -->
-                            <Path Data="M 30,0 L 30,30 L 0,30" Stroke="#A371F7" StrokeThickness="3" 
-                                  Canvas.Left="210" Canvas.Top="270" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-
-                            <!-- Scanning Line -->
-                            <Rectangle x:Name="ScanLine" Width="220" Height="2" Canvas.Left="20" Canvas.Top="160"
-                                       RadiusX="1" RadiusY="1" RenderTransformOrigin="0.5,0.5">
-                                <Rectangle.Fill>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <GradientStop Color="#0058A6FF" Offset="0"/>
-                                        <GradientStop Color="#58A6FF" Offset="0.5"/>
-                                        <GradientStop Color="#0058A6FF" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Rectangle.Fill>
-                                <Rectangle.Effect>
-                                    <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.8" Color="#58A6FF"/>
-                                </Rectangle.Effect>
-                                <Rectangle.RenderTransform>
-                                    <TranslateTransform Y="0"/>
-                                </Rectangle.RenderTransform>
-                            </Rectangle>
-
-                            <!-- Loading Ring (for verification state) -->
-                            <Path x:Name="LoadingRing" 
-                                  Data="M130,30 A100,100 0 0 1 230,160" 
-                                  Stroke="#A371F7" StrokeThickness="3"
-                                  Canvas.Left="0" Canvas.Top="0"
-                                  Opacity="0.6"
-                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  RenderTransformOrigin="0.5,0.5">
-                                <Path.RenderTransform>
-                                    <RotateTransform Angle="0" CenterX="130" CenterY="160"/>
-                                </Path.RenderTransform>
-                            </Path>
-
-                        </Canvas>
-
-                        <!-- Success Checkmark (Hidden by default) -->
-                        <Viewbox x:Name="SuccessCheckmark" Width="100" Height="100" 
-                                 HorizontalAlignment="Center" VerticalAlignment="Center"
-                                 Visibility="Collapsed" Opacity="0">
-                            <Canvas Width="100" Height="100">
-                                <Ellipse Width="100" Height="100" Fill="#3FB950" Opacity="0.2"/>
-                                <Ellipse Width="80" Height="80" Canvas.Left="10" Canvas.Top="10">
-                                    <Ellipse.Fill>
-                                        <RadialGradientBrush>
-                                            <GradientStop Color="#3FB950" Offset="0"/>
-                                            <GradientStop Color="#238636" Offset="1"/>
-                                        </RadialGradientBrush>
-                                    </Ellipse.Fill>
-                                </Ellipse>
-                                <Path Data="M25,50 L42,67 L75,34" Stroke="White" StrokeThickness="6"
-                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
-                            </Canvas>
-                        </Viewbox>
-
-                    </Grid>
-                </Border>
+                <!-- Success Checkmark Overlay -->
+                <Grid x:Name="SuccessCheckmark" Visibility="{Binding ShowSuccessCheckmark, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Ellipse Width="100" Height="100" Fill="#238636" Opacity="0.9"/>
+                    <Path Data="M35,50 L48,65 L70,35" Stroke="White" StrokeThickness="6"
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
+                </Grid>
 
             </Grid>
 
             <!-- ═══════════════════════════════════════════════════════════════
                  BOTTOM STATUS PANEL
             ═══════════════════════════════════════════════════════════════ -->
-            <Border Grid.Row="2" Margin="24,0,24,24" Style="{StaticResource GlassCard}" Padding="24,20">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Status Header -->
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12">
-                        <Ellipse x:Name="StatusIndicator" Width="10" Height="10" Margin="0,0,10,0">
+            <StackPanel Grid.Row="2" Margin="24,0,24,30">
+                
+                <!-- Status Text -->
+                <StackPanel HorizontalAlignment="Center" Margin="0,0,0,24">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+                        <Ellipse x:Name="StatusDot" Width="8" Height="8" Margin="0,0,8,0">
                             <Ellipse.Fill>
                                 <SolidColorBrush Color="#58A6FF"/>
                             </Ellipse.Fill>
-                            <Ellipse.Effect>
-                                <DropShadowEffect BlurRadius="8" ShadowDepth="0" Opacity="0.8" Color="#58A6FF"/>
-                            </Ellipse.Effect>
                         </Ellipse>
-                        <TextBlock x:Name="StatusTitle" Text="Looking for face..." 
-                                   FontSize="16" FontWeight="SemiBold" Foreground="#F0F6FC"
-                                   FontFamily="Segoe UI Variable"/>
+                        <TextBlock x:Name="StatusTitle" Text="{Binding StatusMessage}" FontSize="16" FontWeight="SemiBold" 
+                                   Foreground="#F0F6FC" TextAlignment="Center"/>
                     </StackPanel>
+                    
+                    <TextBlock x:Name="StatusDescription" Text="{Binding StatusText}" FontSize="13" Foreground="#8B949E" 
+                               TextAlignment="Center" TextWrapping="Wrap"/>
+                </StackPanel>
 
-                    <!-- Status Description -->
-                    <TextBlock Grid.Row="1" x:Name="StatusDescription" 
-                               Text="Position your face within the frame" 
-                               FontSize="13" Foreground="#8B949E" TextAlignment="Center"
-                               FontFamily="Segoe UI Variable" Margin="0,0,0,16"/>
+                <!-- Action Buttons -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                    <!-- Action Buttons -->
-                    <Grid Grid.Row="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="8"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="8"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Button Grid.Column="0" Content="📊 Dashboard" Style="{StaticResource ModernButton}"
-                                Click="Dashboard_Click" FontSize="12"/>
-                        <Button Grid.Column="2" Content="👤 Enroll" Style="{StaticResource PrimaryButton}"
-                                Click="EnrollFace_Click" FontSize="12"/>
-                        <Button Grid.Column="4" Content="🔑 PIN" Style="{StaticResource ModernButton}"
-                                Click="FallbackAuth_Click" FontSize="12"/>
-                    </Grid>
+                    <Button Grid.Column="0" Content="📊 Dashboard" Click="Dashboard_Click"
+                            Style="{StaticResource ModernButton}" Height="40"/>
+                            
+                    <Button Grid.Column="2" Content="🔑 Use PIN" Click="FallbackAuth_Click"
+                            Style="{StaticResource ModernButton}" Height="40"/>
                 </Grid>
-            </Border>
-
-            <!-- Security Badge -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" 
-                        VerticalAlignment="Bottom" Margin="0,0,0,8" Opacity="0.5">
-                <Path Data="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1Z"
-                      Fill="#8B949E" Width="10" Height="10" Stretch="Uniform" Margin="0,0,6,0"/>
-                <TextBlock Text="HIPAA Compliant • AES-256 Encrypted" FontSize="9" 
-                           Foreground="#8B949E" FontFamily="Segoe UI Variable"/>
+                
+                <!-- Version Info -->
+                <TextBlock Text="{Binding AppVersion, StringFormat='v{0}'}" 
+                           FontSize="10" Foreground="#8B949E" Opacity="0.5"
+                           HorizontalAlignment="Center" Margin="0,12,0,0" />
             </StackPanel>
 
         </Grid>

@@ -23,6 +23,7 @@ namespace MedSecureVision.Client.Views;
 public partial class DashboardWindow : Window
 {
     public ObservableCollection<EnrolledFaceModel> EnrolledFaces { get; } = new();
+    public string AppVersion => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
     private readonly string _enrollmentDirectory;
 
     public DashboardWindow()

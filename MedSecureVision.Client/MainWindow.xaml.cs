@@ -44,6 +44,10 @@ public partial class MainWindow : System.Windows.Window, IDisposable
         if (DataContext is AuthenticationViewModel viewModel)
         {
             viewModel.AuthenticationStateChanged += OnAuthenticationStateChanged;
+            
+            // Initial state check
+            if (viewModel.AuthenticationState == "NotEnrolled")
+                UpdateUIForNotEnrolled();
         }
     }
 
@@ -85,8 +89,12 @@ public partial class MainWindow : System.Windows.Window, IDisposable
             _cameraTimer.Start();
             _cameraStarted = true;
 
-            StatusTitle.Text = "Looking for face...";
-            StatusDescription.Text = "Position your face within the frame";
+            // Only set text if not overridden by VM
+            if (StatusTitle.Text == "Looking for face...")
+            {
+                StatusTitle.Text = "Looking for face...";
+                StatusDescription.Text = "Position your face within the frame";
+            }
         }
         catch (Exception ex)
         {
@@ -191,13 +199,19 @@ public partial class MainWindow : System.Windows.Window, IDisposable
                 case "Failure":
                     PlayFailureAnimation();
                     break;
+                case "LockedOut":
+                    UpdateUIForLockedOut();
+                    break;
+                case "NotEnrolled":
+                    UpdateUIForNotEnrolled();
+                    break;
             }
         });
     }
 
     private void UpdateUIForSearching()
     {
-        StatusIndicator.Fill = new SolidColorBrush(Color.FromRgb(0x58, 0xA6, 0xFF));
+        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0x58, 0xA6, 0xFF));
         StatusTitle.Text = "Looking for face...";
         StatusDescription.Text = "Position your face within the frame";
         UpdateFaceGuideColor("#58A6FF");
@@ -205,7 +219,7 @@ public partial class MainWindow : System.Windows.Window, IDisposable
 
     private void UpdateUIForPositioning()
     {
-        StatusIndicator.Fill = new SolidColorBrush(Color.FromRgb(0xD2, 0x99, 0x22));
+        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xD2, 0x99, 0x22));
         StatusTitle.Text = "Adjusting...";
         StatusDescription.Text = "Move closer and center your face";
         UpdateFaceGuideColor("#D29922");
@@ -213,31 +227,49 @@ public partial class MainWindow : System.Windows.Window, IDisposable
 
     private void UpdateUIForVerifying()
     {
-        StatusIndicator.Fill = new SolidColorBrush(Color.FromRgb(0xA3, 0x71, 0xF7));
+        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xA3, 0x71, 0xF7));
         StatusTitle.Text = "Verifying identity...";
         StatusDescription.Text = "Please hold still";
         UpdateFaceGuideColor("#A371F7");
+    }
+
+    private void UpdateUIForLockedOut()
+    {
+        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xF8, 0x51, 0x49));
+        StatusTitle.Text = "Biometrics Locked";
+        StatusDescription.Text = "Too many attempts. Use PIN to unlock.";
+        UpdateFaceGuideColor("#F85149");
+        StopCamera(); // Security measure
+    }
+
+    private void UpdateUIForNotEnrolled()
+    {
+        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xD2, 0x99, 0x22));
+        StatusTitle.Text = "Not Enrolled";
+        StatusDescription.Text = "Please setup Face ID from Dashboard";
+        UpdateFaceGuideColor("#D29922");
     }
 
     private void UpdateFaceGuideColor(string hexColor)
     {
         var color = (Color)ColorConverter.ConvertFromString(hexColor);
         
-        FaceGuide.Stroke = new LinearGradientBrush(
-            color,
-            Color.FromRgb(0xA3, 0x71, 0xF7),
-            new Point(0, 0),
-            new Point(1, 1));
-            
-        if (FaceGuide.Effect is DropShadowEffect shadow)
+        FaceGuideGlow.Fill = new RadialGradientBrush
         {
-            shadow.Color = color;
-        }
+            GradientOrigin = new Point(0.5, 0.5),
+            Center = new Point(0.5, 0.5),
+            RadiusX = 0.5, RadiusY = 0.5,
+            GradientStops = new GradientStopCollection
+            {
+                new GradientStop(Color.FromArgb(80, color.R, color.G, color.B), 0.7),
+                new GradientStop(color, 1)
+            }
+        };
     }
 
     private void PlaySuccessAnimation()
     {
-        StatusIndicator.Fill = new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50));
+        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50));
         StatusTitle.Text = "Welcome!";
         StatusDescription.Text = "Authentication successful";
 
@@ -263,7 +295,7 @@ public partial class MainWindow : System.Windows.Window, IDisposable
 
     private void PlayFailureAnimation()
     {
-        StatusIndicator.Fill = new SolidColorBrush(Color.FromRgb(0xF8, 0x51, 0x49));
+        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xF8, 0x51, 0x49));
         StatusTitle.Text = "Not recognized";
         StatusDescription.Text = "Please try again or use PIN";
 
@@ -278,7 +310,8 @@ public partial class MainWindow : System.Windows.Window, IDisposable
         shakeAnimation.KeyFrames.Add(new EasingDoubleKeyFrame(0, TimeSpan.FromMilliseconds(350)));
 
         var transform = new TranslateTransform();
-        FaceGuide.RenderTransform = transform;
+        // Shake the whole circular mask container if possible, but FaceGuideGlow is simpler
+        FaceGuideGlow.RenderTransform = transform;
         transform.BeginAnimation(TranslateTransform.XProperty, shakeAnimation);
 
         UpdateFaceGuideColor("#F85149");
@@ -316,28 +349,6 @@ public partial class MainWindow : System.Windows.Window, IDisposable
         var fallbackWindow = new FallbackAuthWindow();
         fallbackWindow.Owner = this;
         fallbackWindow.ShowDialog();
-    }
-
-    private void EnrollFace_Click(object sender, RoutedEventArgs e)
-    {
-        // Stop main camera while enrolling
-        StopCamera();
-        
-        // Use Apple-style enrollment window
-        var enrollmentWindow = new AppleStyleEnrollmentWindow();
-        enrollmentWindow.Owner = this;
-        var result = enrollmentWindow.ShowDialog();
-        
-        // Restart camera
-        StartCamera();
-        
-        if (result == true)
-        {
-            StatusTitle.Text = "Face ID Set Up!";
-            StatusDescription.Text = "You can now use Face ID to authenticate";
-            StatusIndicator.Fill = new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50));
-            UpdateFaceGuideColor("#3FB950");
-        }
     }
 
     private void Dashboard_Click(object sender, RoutedEventArgs e)

@@ -427,12 +427,15 @@
             <!-- ═══════════════════════════════════════════════════════════════
                  FOOTER - Version & Security Info
             ═══════════════════════════════════════════════════════════════ -->
-            <Border Grid.Row="1" VerticalAlignment="Bottom" Margin="24,0,24,16">
+            <Border Grid.Row="1" VerticalAlignment="Bottom" Margin="24,0,24,16" IsHitTestVisible="False">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Opacity="0.5">
                     <Path Data="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1Z"
                           Fill="#8B949E" Width="12" Height="12" Stretch="Uniform" Margin="0,0,8,0"/>
-                    <TextBlock Text="MedSecure Vision v1.0.0 • HIPAA Compliant • AES-256 Encrypted" 
-                               FontSize="10" Foreground="#8B949E" FontFamily="Segoe UI Variable"/>
+                    <TextBlock FontSize="10" Foreground="#8B949E" FontFamily="Segoe UI Variable">
+                        <Run Text="MedSecure Vision v"/>
+                        <Run Text="{Binding AppVersion}"/>
+                        <Run Text=" • HIPAA Compliant • AES-256 Encrypted"/>
+                    </TextBlock>
                 </StackPanel>
             </Border>
         </Grid>
