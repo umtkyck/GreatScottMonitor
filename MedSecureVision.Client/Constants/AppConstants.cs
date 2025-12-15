@@ -3,7 +3,7 @@ using Color = System.Windows.Media.Color;
 namespace MedSecureVision.Client.Constants;
 
 /// <summary>
-/// Application-wide constants for MedSecure Vision.
+/// Application-wide constants for CXA.
 /// Centralizes colors, paths, dimensions, and configuration values.
 /// </summary>
 public static class AppConstants
@@ -11,14 +11,19 @@ public static class AppConstants
     #region Version Information
 
     /// <summary>
-    /// Current application version.
+    /// Current application version (Release 1, Milestone 1).
     /// </summary>
-    public const string AppVersion = "1.0.0";
+    public const string AppVersion = "R1M1";
 
     /// <summary>
     /// Application name displayed in UI.
     /// </summary>
-    public const string AppName = "MedSecure Vision";
+    public const string AppName = "CXA";
+
+    /// <summary>
+    /// Full application title with version.
+    /// </summary>
+    public const string AppTitle = "CXA - Biometric Authentication";
 
     #endregion
 

@@ -1,8 +1,9 @@
 """
-MedSecure Vision Face Service
+CXA Face Service
+Biometric authentication using facial recognition
 """
 
-__version__ = "1.0.0"
+__version__ = "R1M1"
 
 
 

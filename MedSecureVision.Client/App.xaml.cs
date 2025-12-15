@@ -14,7 +14,7 @@ using MessageBox = System.Windows.MessageBox;
 namespace MedSecureVision.Client;
 
 /// <summary>
-/// Application entry point for MedSecure Vision.
+/// Application entry point for CXA.
 /// Manages application lifecycle, dependency injection, system tray integration,
 /// and background service operation.
 /// </summary>
@@ -49,7 +49,7 @@ public partial class App : Application
         if (!createdNew)
         {
             MessageBox.Show(
-                "MedSecure Vision is already running.\nCheck your system tray.", 
+                $"{AppConstants.AppName} is already running.\nCheck your system tray.", 
                 "Already Running", 
                 MessageBoxButton.OK, 
                 MessageBoxImage.Information);
@@ -118,7 +118,7 @@ public partial class App : Application
         
         // Show startup notification
         _trayService.ShowNotification(
-            "MedSecure Vision Started",
+            $"{AppConstants.AppName} Started",
             "Face authentication service is running.\nRight-click tray icon for options.");
     }
 

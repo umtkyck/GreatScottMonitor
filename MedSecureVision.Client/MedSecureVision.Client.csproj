@@ -13,10 +13,11 @@
     <Version>1.0.0</Version>
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <Company>MedSecure Vision</Company>
-    <Product>MedSecure Vision - Biometric Authentication</Product>
-    <Description>HIPAA-compliant facial recognition authentication system</Description>
-    <Copyright>Copyright © 2024 MedSecure Vision</Copyright>
+    <InformationalVersion>R1M1</InformationalVersion>
+    <Company>CXA</Company>
+    <Product>CXA - Biometric Authentication</Product>
+    <Description>Secure facial recognition authentication system</Description>
+    <Copyright>Copyright © 2024 CXA</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

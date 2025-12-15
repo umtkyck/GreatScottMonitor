@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (
       <div className="login-container">
         <div className="login-box">
-          <h1>MedSecure Vision Admin</h1>
+          <h1>CXA Admin</h1>
           <p>Please log in to continue</p>
           <button onClick={() => loginWithRedirect()}>Log In</button>
         </div>
@@ -27,7 +27,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="layout">
       <nav className="sidebar">
         <div className="sidebar-header">
-          <h2>MedSecure Vision</h2>
+          <h2>CXA</h2>
         </div>
         <ul className="nav-menu">
           <li className={location.pathname === '/dashboard' ? 'active' : ''}>
@@ -51,7 +51,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             Logout
           </button>
           <div className="version-info" style={{ marginTop: '1rem', fontSize: '0.75rem', color: '#666', textAlign: 'center', opacity: 0.7 }}>
-            v1.0.0
+            R1M1
           </div>
         </div>
       </nav>

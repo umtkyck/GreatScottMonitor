@@ -9,7 +9,7 @@ using MessageBox = System.Windows.MessageBox;
 namespace MedSecureVision.Client.Services;
 
 /// <summary>
-/// System tray service for MedSecure Vision.
+/// System tray service for CXA.
 /// Provides background operation with tray icon, status indicator, and quick actions.
 /// </summary>
 public class SystemTrayService : IDisposable
@@ -106,7 +106,7 @@ public class SystemTrayService : IDisposable
         _notifyIcon = new NotifyIcon
         {
             Icon = CreateTrayIcon(false),
-            Text = "MedSecure Vision\nStatus: Not Enrolled",
+            Text = $"{AppConstants.AppName}\nStatus: Not Enrolled",
             Visible = true,
             ContextMenuStrip = _contextMenu
         };
@@ -169,7 +169,7 @@ public class SystemTrayService : IDisposable
         if (_notifyIcon != null)
         {
             _notifyIcon.Icon = CreateTrayIcon(isEnrolled);
-            _notifyIcon.Text = $"MedSecure Vision\nStatus: {(isEnrolled ? "Enrolled ✓" : "Not Enrolled")}";
+            _notifyIcon.Text = $"{AppConstants.AppName}\nStatus: {(isEnrolled ? "Enrolled ✓" : "Not Enrolled")}";
         }
 
         // Update menu item
@@ -195,7 +195,7 @@ public class SystemTrayService : IDisposable
         {
             _notifyIcon.ShowBalloonTip(
                 2000,
-                "MedSecure Vision",
+                AppConstants.AppName,
                 running ? "Service started" : "Service stopped",
                 ToolTipIcon.Info);
         }
@@ -254,8 +254,8 @@ public class SystemTrayService : IDisposable
     private void OnExit(object? sender, EventArgs e)
     {
         var result = MessageBox.Show(
-            "Are you sure you want to exit MedSecure Vision?\nThe authentication service will stop.",
-            "Exit MedSecure Vision",
+            $"Are you sure you want to exit {AppConstants.AppName}?\nThe authentication service will stop.",
+            $"Exit {AppConstants.AppName}",
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 

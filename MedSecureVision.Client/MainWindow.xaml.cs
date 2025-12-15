@@ -20,7 +20,7 @@ using MessageBox = System.Windows.MessageBox;
 namespace MedSecureVision.Client;
 
 /// <summary>
-/// Main authentication window for MedSecure Vision.
+/// Main authentication window for CXA.
 /// Provides Face ID-like biometric authentication experience.
 /// </summary>
 public partial class MainWindow : System.Windows.Window, IDisposable

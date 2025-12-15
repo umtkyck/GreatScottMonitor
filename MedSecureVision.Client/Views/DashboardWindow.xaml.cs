@@ -214,7 +214,7 @@ public partial class DashboardWindow : Window
     {
         var dialog = new Microsoft.Win32.SaveFileDialog
         {
-            FileName = $"MedSecureVision_Export_{DateTime.Now:yyyyMMdd}",
+            FileName = $"CXA_Export_{DateTime.Now:yyyyMMdd}",
             DefaultExt = ".json",
             Filter = "JSON Files (*.json)|*.json"
         };

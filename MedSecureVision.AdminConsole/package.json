@@ -1,6 +1,6 @@
 {
-  "name": "medsecure-vision-admin-console",
-  "version": "1.0.0",
+  "name": "cxa-admin-console",
+  "version": "1.0.0-R1M1",
   "private": true,
   "dependencies": {
     "@auth0/auth0-react": "^2.2.0",

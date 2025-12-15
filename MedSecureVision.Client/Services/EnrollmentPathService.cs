@@ -10,7 +10,7 @@ namespace MedSecureVision.Client.Services;
 public interface IEnrollmentPathService
 {
     /// <summary>
-    /// Gets the base directory for MedSecure Vision data.
+    /// Gets the base directory for CXA data.
     /// </summary>
     string BaseDirectory { get; }
 

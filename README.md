@@ -1,10 +1,12 @@
-# MedSecure Vision
+# CXA - Biometric Authentication System
 
-Smart Biometric Authentication Monitor for Healthcare
+**Version: R1M1**
+
+Smart Biometric Authentication Monitor
 
 ## Overview
 
-MedSecure Vision is a HIPAA-compliant biometric authentication system for healthcare environments that provides Apple Face ID-like facial recognition using built-in cameras. The system integrates with cloud authentication services, provides real-time continuous presence monitoring, and automatically locks sessions when users leave their workstations.
+CXA is a secure biometric authentication system that provides Apple Face ID-like facial recognition using built-in cameras. The system integrates with cloud authentication services, provides real-time continuous presence monitoring, and automatically locks sessions when users leave their workstations.
 
 ## Architecture
 
