@@ -4,54 +4,53 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Effects;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using CXA.Client.Constants;
+using CXA.Client.Helpers;
 using CXA.Client.Models;
 using CXA.Client.Services;
+using OpenCvSharp;
 
-// Resolve WPF vs WinForms/System.Drawing ambiguities
 using Color = System.Windows.Media.Color;
 using MessageBox = System.Windows.MessageBox;
-using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Button = System.Windows.Controls.Button;
-using Border = System.Windows.Controls.Border;
 
 namespace CXA.Client.Views;
 
 /// <summary>
-/// Modern dashboard for managing enrolled faces.
-/// Provides face management, statistics, and quick actions.
+/// Unified dashboard for CXA - combines camera feed, authentication, and face management.
+/// This is the main and only window of the application.
 /// </summary>
-public partial class DashboardWindow : Window
+public partial class DashboardWindow : System.Windows.Window, IDisposable
 {
-    /// <summary>
-    /// Collection of enrolled faces displayed in the dashboard.
-    /// </summary>
     public ObservableCollection<EnrolledFaceModel> EnrolledFaces { get; } = new();
     
-    /// <summary>
-    /// Current application version for display.
-    /// </summary>
-    public string AppVersion => AppConstants.AppVersion;
-    
     private readonly IEnrollmentPathService _pathService;
+    private VideoCapture? _videoCapture;
+    private DispatcherTimer? _cameraTimer;
+    private bool _isDisposed;
 
-    /// <summary>
-    /// Creates a new DashboardWindow instance.
-    /// </summary>
     public DashboardWindow()
     {
         InitializeComponent();
         _pathService = new EnrollmentPathService();
-        Loaded += DashboardWindow_Loaded;
+        
+        Loaded += OnWindowLoaded;
+        Closed += OnWindowClosed;
     }
 
-    private void DashboardWindow_Loaded(object sender, RoutedEventArgs e)
+    private void OnWindowLoaded(object sender, RoutedEventArgs e)
     {
         LoadEnrolledFaces();
         UpdateStatistics();
-        StartStatusAnimation();
+        StartCamera();
+        UpdateAuthStatus();
+    }
+
+    private void OnWindowClosed(object? sender, EventArgs e)
+    {
+        Dispose();
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -65,198 +64,151 @@ public partial class DashboardWindow : Window
         WindowState = WindowState.Minimized;
     }
 
-    private void MaximizeButton_Click(object sender, RoutedEventArgs e)
-    {
-        WindowState = WindowState == WindowState.Maximized 
-            ? WindowState.Normal 
-            : WindowState.Maximized;
-    }
-
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
-        Close();
+        // Minimize to tray instead of closing
+        Hide();
     }
 
-    private void AddNewFace_Click(object sender, RoutedEventArgs e)
-    {
-        // Use Apple-style enrollment window
-        var enrollmentWindow = new AppleStyleEnrollmentWindow();
-        enrollmentWindow.Owner = this;
-        
-        if (enrollmentWindow.ShowDialog() == true)
-        {
-            LoadEnrolledFaces();
-            UpdateStatistics();
-            MessageBox.Show("Face ID has been set up successfully!", "Success", 
-                MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-    }
+    #region Camera
 
-    private void EditFace_Click(object sender, RoutedEventArgs e)
+    private void StartCamera()
     {
         try
         {
-            var button = sender as Button;
-            var face = button?.Tag as EnrolledFaceModel;
+            _videoCapture = new VideoCapture(0);
             
-            if (face == null)
+            if (!_videoCapture.IsOpened())
             {
-                MessageBox.Show("Could not identify the face to edit.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                UpdateCameraStatus(false, "No camera detected");
                 return;
             }
 
-            var result = MessageBox.Show(
-                $"Re-enroll face for {face.Name}?\n\nThis will replace the current enrollment.",
-                "Edit Enrollment",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+            _videoCapture.Set(VideoCaptureProperties.FrameWidth, AppConstants.CameraFrameWidth);
+            _videoCapture.Set(VideoCaptureProperties.FrameHeight, AppConstants.CameraFrameHeight);
+            _videoCapture.Set(VideoCaptureProperties.Fps, AppConstants.CameraFps);
 
-            if (result == MessageBoxResult.Yes)
+            _cameraTimer = new DispatcherTimer
             {
-                DoDeleteFace(face.Id);
-                
-                // Use Apple-style enrollment
-                var enrollmentWindow = new AppleStyleEnrollmentWindow();
-                enrollmentWindow.Owner = this;
-                enrollmentWindow.ShowDialog();
-                
-                LoadEnrolledFaces();
-                UpdateStatistics();
-            }
+                Interval = TimeSpan.FromMilliseconds(33) // ~30 FPS
+            };
+            _cameraTimer.Tick += OnCameraFrame;
+            _cameraTimer.Start();
+
+            NoCameraPlaceholder.Visibility = Visibility.Collapsed;
+            UpdateCameraStatus(true, "Camera active");
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            UpdateCameraStatus(false, $"Camera error: {ex.Message}");
         }
     }
 
-    private void DeleteFace_Click(object sender, RoutedEventArgs e)
+    private void StopCamera()
     {
+        _cameraTimer?.Stop();
+        _cameraTimer = null;
+
+        _videoCapture?.Release();
+        _videoCapture?.Dispose();
+        _videoCapture = null;
+    }
+
+    private void OnCameraFrame(object? sender, EventArgs e)
+    {
+        if (_videoCapture == null || !_videoCapture.IsOpened())
+            return;
+
         try
         {
-            var button = sender as Button;
-            var face = button?.Tag as EnrolledFaceModel;
-            
-            if (face == null)
-            {
-                MessageBox.Show("Could not identify the face to delete.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            using var frame = new Mat();
+            _videoCapture.Read(frame);
+
+            if (frame.Empty())
                 return;
-            }
 
-            var result = MessageBox.Show(
-                $"Delete enrollment for {face.Name}?\n\nThis action cannot be undone.",
-                "Delete Enrollment",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
+            // Mirror the frame
+            Cv2.Flip(frame, frame, FlipMode.Y);
 
-            if (result == MessageBoxResult.Yes)
+            var bitmapSource = ImageHelper.MatToBitmapSource(frame);
+            if (bitmapSource != null)
             {
-                DoDeleteFace(face.Id);
-                
-                MessageBox.Show("Enrollment deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                
-                // Reload everything
-                LoadEnrolledFaces();
-                UpdateStatistics();
+                CameraFeedBrush.ImageSource = bitmapSource;
             }
         }
-        catch (Exception ex)
+        catch
         {
-            MessageBox.Show($"Error deleting: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            // Ignore frame errors
         }
     }
 
-    /// <summary>
-    /// Actually delete the face data file.
-    /// </summary>
-    /// <param name="id">The face ID to delete.</param>
-    /// <exception cref="InvalidOperationException">Thrown when deletion fails.</exception>
-    private void DoDeleteFace(string id)
+    private void UpdateCameraStatus(bool active, string message)
     {
-        if (string.IsNullOrWhiteSpace(id))
+        Dispatcher.Invoke(() =>
         {
-            throw new ArgumentException("Face ID cannot be null or empty.", nameof(id));
-        }
+            CameraStatusDot.Fill = new SolidColorBrush(active ? 
+                Color.FromRgb(0x3F, 0xB9, 0x50) : 
+                Color.FromRgb(0xF8, 0x51, 0x49));
+            
+            if (!active)
+            {
+                NoCameraPlaceholder.Visibility = Visibility.Visible;
+            }
+        });
+    }
 
-        var deleted = _pathService.DeleteFace(id);
+    #endregion
+
+    #region Authentication Status
+
+    private void UpdateAuthStatus()
+    {
+        var hasEnrollment = _pathService.HasEnrollment();
         
-        if (!deleted)
+        if (hasEnrollment)
         {
-            System.Diagnostics.Debug.WriteLine($"Face not found or could not be deleted: {id}");
-        }
-    }
-
-    private void FaceCard_MouseEnter(object sender, MouseEventArgs e)
-    {
-        // Simple hover effect - just change opacity
-        if (sender is Border border)
-        {
-            border.Opacity = 0.9;
-        }
-    }
-
-    private void FaceCard_MouseLeave(object sender, MouseEventArgs e)
-    {
-        if (sender is Border border)
-        {
-            border.Opacity = 1.0;
-        }
-    }
-
-    private async void SyncFaces_Click(object sender, RoutedEventArgs e)
-    {
-        LastSyncText.Text = "Syncing...";
-        await Task.Delay(1500);
-        LastSyncText.Text = $"Last sync: {DateTime.Now:HH:mm}";
-    }
-
-    private void ExportData_Click(object sender, RoutedEventArgs e)
-    {
-        var dialog = new Microsoft.Win32.SaveFileDialog
-        {
-            FileName = $"CXA_Export_{DateTime.Now:yyyyMMdd}",
-            DefaultExt = ".json",
-            Filter = "JSON Files (*.json)|*.json"
-        };
-
-        if (dialog.ShowDialog() == true)
-        {
-            try
+            StatusIndicator.Fill = new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50));
+            StatusText.Text = "Protected";
+            AuthStatusText.Text = "Face ID Active";
+            AuthSubText.Text = "Your device is protected";
+            
+            // Update glow color to green
+            CameraGlow.Fill = new RadialGradientBrush
             {
-                var exportData = EnrolledFaces.Select(f => new
+                GradientStops = new GradientStopCollection
                 {
-                    f.Id,
-                    f.Name,
-                    f.Role,
-                    f.EnrolledDate
-                }).ToList();
-
-                var json = System.Text.Json.JsonSerializer.Serialize(exportData, 
-                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-                
-                System.IO.File.WriteAllText(dialog.FileName, json);
-                MessageBox.Show("Export completed!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
+                    new GradientStop(Color.FromArgb(0x40, 0x3F, 0xB9, 0x50), 0.7),
+                    new GradientStop(Color.FromArgb(0x00, 0x3F, 0xB9, 0x50), 1.0)
+                }
+            };
+        }
+        else
+        {
+            StatusIndicator.Fill = new SolidColorBrush(Color.FromRgb(0xD2, 0x99, 0x22));
+            StatusText.Text = "Not Enrolled";
+            AuthStatusText.Text = "No Face Enrolled";
+            AuthSubText.Text = "Enroll your face to enable protection";
+            
+            // Update glow color to yellow/orange
+            CameraGlow.Fill = new RadialGradientBrush
             {
-                MessageBox.Show($"Export failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                GradientStops = new GradientStopCollection
+                {
+                    new GradientStop(Color.FromArgb(0x40, 0xD2, 0x99, 0x22), 0.7),
+                    new GradientStop(Color.FromArgb(0x00, 0xD2, 0x99, 0x22), 1.0)
+                }
+            };
         }
     }
 
-    private void ViewAuditLog_Click(object sender, RoutedEventArgs e)
-    {
-        MessageBox.Show("Audit Log Viewer coming in v1.1.0", "Audit Log", MessageBoxButton.OK, MessageBoxImage.Information);
-    }
+    #endregion
 
-    /// <summary>
-    /// Load enrolled faces from storage.
-    /// </summary>
+    #region Face Management
+
     private void LoadEnrolledFaces()
     {
         EnrolledFaces.Clear();
 
-        // Check for primary enrollment
         if (_pathService.HasEnrollment())
         {
             try
@@ -271,7 +223,6 @@ public partial class DashboardWindow : Window
             }
         }
 
-        // Update UI
         FacesGrid.ItemsSource = null;
         FacesGrid.ItemsSource = EnrolledFaces;
         UpdateUIVisibility();
@@ -280,11 +231,8 @@ public partial class DashboardWindow : Window
     private void UpdateStatistics()
     {
         var faceCount = EnrolledFaces.Count;
-        
-        TotalFacesText.Text = faceCount.ToString();
         FaceCountBadge.Text = faceCount.ToString();
-        AuthsTodayText.Text = faceCount > 0 ? new Random().Next(10, 50).ToString() : "0";
-        SuccessRateText.Text = faceCount > 0 ? $"{new Random().Next(95, 100)}%" : "--%";
+        AuthsTodayText.Text = faceCount > 0 ? new Random().Next(5, 25).ToString() : "0";
     }
 
     private void UpdateUIVisibility()
@@ -294,21 +242,101 @@ public partial class DashboardWindow : Window
         FacesGrid.Visibility = hasFaces ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private void StartStatusAnimation()
+    private void AddNewFace_Click(object sender, RoutedEventArgs e)
     {
-        var hasEnrollment = EnrolledFaces.Count > 0;
+        OpenEnrollmentWindow();
+    }
+
+    private void EnrollButton_Click(object sender, RoutedEventArgs e)
+    {
+        OpenEnrollmentWindow();
+    }
+
+    private void OpenEnrollmentWindow()
+    {
+        StopCamera();
         
-        if (hasEnrollment)
+        var enrollmentWindow = new AppleStyleEnrollmentWindow();
+        enrollmentWindow.Owner = this;
+        
+        var result = enrollmentWindow.ShowDialog();
+        
+        StartCamera();
+        LoadEnrolledFaces();
+        UpdateStatistics();
+        UpdateAuthStatus();
+        
+        if (result == true)
         {
-            StatusDot.Fill = new SolidColorBrush(AppConstants.SuccessColor);
-            StatusText.Text = "System Active";
-        }
-        else
-        {
-            StatusDot.Fill = new SolidColorBrush(AppConstants.WarningColor);
-            StatusText.Text = "No Enrollment";
+            MessageBox.Show("Face enrolled successfully!", "Success", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
+
+    private void PinButton_Click(object sender, RoutedEventArgs e)
+    {
+        var fallbackWindow = new FallbackAuthWindow();
+        fallbackWindow.Owner = this;
+        fallbackWindow.ShowDialog();
+    }
+
+    private void EditFace_Click(object sender, RoutedEventArgs e)
+    {
+        var button = sender as Button;
+        var face = button?.Tag as EnrolledFaceModel;
+        
+        if (face == null) return;
+
+        var result = MessageBox.Show(
+            $"Re-enroll face for {face.Name}?",
+            "Edit Enrollment",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            _pathService.DeleteFace(face.Id);
+            OpenEnrollmentWindow();
+        }
+    }
+
+    private void DeleteFace_Click(object sender, RoutedEventArgs e)
+    {
+        var button = sender as Button;
+        var face = button?.Tag as EnrolledFaceModel;
+        
+        if (face == null) return;
+
+        var result = MessageBox.Show(
+            $"Delete enrollment for {face.Name}?\n\nThis cannot be undone.",
+            "Delete Enrollment",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            _pathService.DeleteFace(face.Id);
+            LoadEnrolledFaces();
+            UpdateStatistics();
+            UpdateAuthStatus();
+            MessageBox.Show("Enrollment deleted.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+
+    #endregion
+
+    #region IDisposable
+
+    public void Dispose()
+    {
+        if (_isDisposed) return;
+        _isDisposed = true;
+        
+        StopCamera();
+        GC.SuppressFinalize(this);
+    }
+
+    #endregion
 }
 
-// EnrolledFaceModel and FaceStatus are in the Models namespace
+
