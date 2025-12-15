@@ -2,6 +2,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Runtime.InteropServices;
+using MedSecureVision.Client.Constants;
+using MedSecureVision.Client.Helpers;
 using Microsoft.Extensions.Logging;
 using OpenCvSharp;
 
@@ -83,9 +85,9 @@ public class CameraService : ICameraService, IDisposable
 
                 // Set camera properties for optimal performance
                 // Use 4:3 aspect ratio to better match the face guide oval
-                _videoCapture.Set(VideoCaptureProperties.FrameWidth, 640);
-                _videoCapture.Set(VideoCaptureProperties.FrameHeight, 480);
-                _videoCapture.Set(VideoCaptureProperties.Fps, 30);
+                _videoCapture.Set(VideoCaptureProperties.FrameWidth, AppConstants.CameraFrameWidth);
+                _videoCapture.Set(VideoCaptureProperties.FrameHeight, AppConstants.CameraFrameHeight);
+                _videoCapture.Set(VideoCaptureProperties.Fps, AppConstants.CameraFps);
 
                 _currentFrame = new Mat();
                 _isCapturing = true;
@@ -105,7 +107,7 @@ public class CameraService : ICameraService, IDisposable
         {
             _captureTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(33) // ~30 FPS
+                Interval = TimeSpan.FromMilliseconds(AppConstants.CameraTimerIntervalMs)
             };
             _captureTimer.Tick += OnCaptureTimerTick;
             _captureTimer.Start();
@@ -152,15 +154,7 @@ public class CameraService : ICameraService, IDisposable
                 if (_currentFrame == null || _currentFrame.Empty())
                     return null;
 
-                try
-                {
-                    return MatToBitmapSource(_currentFrame);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error converting frame to BitmapSource");
-                    return null;
-                }
+                return ImageHelper.MatToBitmapSource(_currentFrame, _logger);
             }
         });
     }
@@ -240,7 +234,7 @@ public class CameraService : ICameraService, IDisposable
             if (_videoCapture.Read(frame) && !frame.Empty())
             {
                 // Flip horizontally for mirror effect (like a selfie camera)
-                Cv2.Flip(frame, frame, FlipMode.Y);
+                ImageHelper.FlipHorizontal(frame);
 
                 lock (_frameLock)
                 {
@@ -251,7 +245,7 @@ public class CameraService : ICameraService, IDisposable
                 // Convert to BitmapSource and raise event
                 try
                 {
-                    var bitmapSource = MatToBitmapSource(frame);
+                    var bitmapSource = ImageHelper.MatToBitmapSource(frame, _logger);
                     if (bitmapSource != null)
                     {
                         FrameCaptured?.Invoke(this, bitmapSource);
@@ -268,68 +262,6 @@ public class CameraService : ICameraService, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error capturing frame");
-        }
-    }
-
-    /// <summary>
-    /// Convert OpenCV Mat to WPF BitmapSource.
-    /// </summary>
-    private BitmapSource? MatToBitmapSource(Mat mat)
-    {
-        if (mat == null || mat.Empty())
-            return null;
-
-        try
-        {
-            // Convert to BGR if necessary
-            Mat displayMat = mat;
-            if (mat.Channels() == 1)
-            {
-                displayMat = new Mat();
-                Cv2.CvtColor(mat, displayMat, ColorConversionCodes.GRAY2BGR);
-            }
-            else if (mat.Channels() == 4)
-            {
-                displayMat = new Mat();
-                Cv2.CvtColor(mat, displayMat, ColorConversionCodes.BGRA2BGR);
-            }
-
-            int width = displayMat.Width;
-            int height = displayMat.Height;
-            int stride = width * 3; // BGR = 3 bytes per pixel
-            
-            // Ensure stride is aligned to 4 bytes for WPF
-            stride = (stride + 3) & ~3;
-
-            byte[] pixels = new byte[height * stride];
-            
-            // Copy pixel data row by row
-            for (int y = 0; y < height; y++)
-            {
-                Marshal.Copy(displayMat.Ptr(y), pixels, y * stride, width * 3);
-            }
-
-            var bitmapSource = BitmapSource.Create(
-                width, height,
-                96, 96, // DPI
-                PixelFormats.Bgr24,
-                null,
-                pixels,
-                stride);
-
-            bitmapSource.Freeze();
-
-            if (displayMat != mat)
-            {
-                displayMat.Dispose();
-            }
-
-            return bitmapSource;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error in MatToBitmapSource");
-            return null;
         }
     }
 

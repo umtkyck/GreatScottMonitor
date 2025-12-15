@@ -5,14 +5,15 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using MedSecureVision.Client.Constants;
+using MedSecureVision.Client.Helpers;
+using MedSecureVision.Client.Services;
 using OpenCvSharp;
 
 // Resolve WPF vs WinForms/System.Drawing/IO ambiguities
 using Color = System.Windows.Media.Color;
-using MessageBox = System.Windows.MessageBox;
-using Path = System.IO.Path;
 using File = System.IO.File;
-using Directory = System.IO.Directory;
+using MessageBox = System.Windows.MessageBox;
 using WpfPath = System.Windows.Shapes.Path;
 
 namespace MedSecureVision.Client.Views;
@@ -28,17 +29,17 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
     private VideoCapture? _videoCapture;
     private DispatcherTimer? _cameraTimer;
     private DispatcherTimer? _scanTimer;
-    private bool _disposed = false;
+    private bool _disposed;
+    private readonly IEnrollmentPathService _pathService;
     
     // Enrollment state
     private EnrollmentPhase _currentPhase = EnrollmentPhase.Ready;
-    private int _currentScan = 0; // 0 = first scan, 1 = second scan
-    private double _scanProgress = 0; // 0 to 100
+    private int _currentScan; // 0 = first scan, 1 = second scan
+    private double _scanProgress; // 0 to 100
     private readonly List<BitmapSource> _capturedFrames = new();
     
-    // Face detection simulation (in production, use actual face detection)
+    // Face detection timing
     private DateTime _scanStartTime;
-    private const double SCAN_DURATION_SECONDS = 4.0; // Time for one complete scan
 
     #endregion
 
@@ -47,6 +48,7 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
     public AppleStyleEnrollmentWindow()
     {
         InitializeComponent();
+        _pathService = new EnrollmentPathService();
         Loaded += OnWindowLoaded;
         Closed += OnWindowClosed;
     }
@@ -88,13 +90,13 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
                 return;
             }
 
-            _videoCapture.Set(VideoCaptureProperties.FrameWidth, 640);
-            _videoCapture.Set(VideoCaptureProperties.FrameHeight, 480);
-            _videoCapture.Set(VideoCaptureProperties.Fps, 30);
+            _videoCapture.Set(VideoCaptureProperties.FrameWidth, AppConstants.CameraFrameWidth);
+            _videoCapture.Set(VideoCaptureProperties.FrameHeight, AppConstants.CameraFrameHeight);
+            _videoCapture.Set(VideoCaptureProperties.Fps, AppConstants.CameraFps);
 
             _cameraTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(33)
+                Interval = TimeSpan.FromMilliseconds(AppConstants.CameraTimerIntervalMs)
             };
             _cameraTimer.Tick += OnCameraFrame;
             _cameraTimer.Start();
@@ -124,40 +126,18 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
             using var frame = new Mat();
             if (_videoCapture.Read(frame) && !frame.Empty())
             {
-                Cv2.Flip(frame, frame, FlipMode.Y);
-                var bitmapSource = MatToBitmapSource(frame);
+                ImageHelper.FlipHorizontal(frame);
+                var bitmapSource = ImageHelper.MatToBitmapSource(frame);
                 if (bitmapSource != null)
                 {
                     CameraFeed.Source = bitmapSource;
                 }
             }
         }
-        catch { }
-    }
-
-    private BitmapSource? MatToBitmapSource(Mat mat)
-    {
-        if (mat == null || mat.Empty()) return null;
-
-        try
+        catch
         {
-            int width = mat.Width;
-            int height = mat.Height;
-            int stride = (width * 3 + 3) & ~3;
-
-            byte[] pixels = new byte[height * stride];
-            for (int y = 0; y < height; y++)
-            {
-                System.Runtime.InteropServices.Marshal.Copy(mat.Ptr(y), pixels, y * stride, width * 3);
-            }
-
-            var bitmapSource = BitmapSource.Create(
-                width, height, 96, 96,
-                PixelFormats.Bgr24, null, pixels, stride);
-            bitmapSource.Freeze();
-            return bitmapSource;
+            // Ignore individual frame capture errors to maintain smooth operation
         }
-        catch { return null; }
     }
 
     #endregion
@@ -186,7 +166,7 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
     private void OnScanTick(object? sender, EventArgs e)
     {
         var elapsed = (DateTime.Now - _scanStartTime).TotalSeconds;
-        _scanProgress = Math.Min((elapsed / SCAN_DURATION_SECONDS) * 100, 100);
+        _scanProgress = Math.Min((elapsed / AppConstants.EnrollmentScanDurationSeconds) * 100, 100);
 
         // Update progress ring
         UpdateProgressRing(_scanProgress);
@@ -336,7 +316,7 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
     private void PlaySuccessAnimation()
     {
         // Make progress ring fully green
-        ProgressArc.Stroke = new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50));
+        ProgressArc.Stroke = new SolidColorBrush(AppConstants.SuccessColor);
         UpdateProgressRing(100);
 
         // Play checkmark animation
@@ -391,19 +371,21 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
     {
         try
         {
-            var enrollmentDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "MedSecureVision");
+            _pathService.EnsureDirectoriesExist();
 
-            Directory.CreateDirectory(enrollmentDir);
+            var enrollmentContent = string.Join("\n", new[]
+            {
+                $"EnrolledAt={DateTime.UtcNow:O}",
+                $"FrameCount={_capturedFrames.Count}",
+                $"Version={AppConstants.AppVersion}",
+                "Method=AppleFaceID"
+            });
 
-            var enrollmentPath = Path.Combine(enrollmentDir, "enrollment.dat");
-            File.WriteAllText(enrollmentPath,
-                $"EnrolledAt={DateTime.UtcNow:O}\nFrameCount={_capturedFrames.Count}\nVersion=1.0.0\nMethod=AppleFaceID");
+            File.WriteAllText(_pathService.PrimaryEnrollmentPath, enrollmentContent);
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Save error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Save enrollment error: {ex.Message}");
         }
     }
 
@@ -435,4 +417,8 @@ public enum EnrollmentPhase
     SecondScan,
     Complete
 }
+
+
+
+
 

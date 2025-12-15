@@ -2,10 +2,10 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using MedSecureVision.Client.Constants;
 using MedSecureVision.Client.Services;
 using MedSecureVision.Shared.Models;
 using Microsoft.Extensions.Logging;
-using System.IO;
 
 namespace MedSecureVision.Client.ViewModels;
 
@@ -18,6 +18,7 @@ public class AuthenticationViewModel : INotifyPropertyChanged
     private readonly IFaceServiceClient _faceServiceClient;
     private readonly ICameraService _cameraService;
     private readonly IAuthenticationService _authenticationService;
+    private readonly IEnrollmentPathService _pathService;
     private readonly ILogger<AuthenticationViewModel>? _logger;
     private readonly DispatcherTimer _detectionTimer;
 
@@ -26,20 +27,22 @@ public class AuthenticationViewModel : INotifyPropertyChanged
     private string _statusText = "Ready";
     private BitmapSource? _cameraFeed;
     private bool _scanningLineVisible = true;
-    private bool _showSuccessCheckmark = false;
-    private bool _isCameraInitialized = false;
-    private bool _isFaceServiceAvailable = false;
-    private bool _hasEnrolledFaces = false;
+    private bool _showSuccessCheckmark;
+    private bool _isCameraInitialized;
+    private bool _isFaceServiceAvailable;
+    private bool _hasEnrolledFaces;
     
     // Security & Lockout
-    private int _failedAttempts = 0;
-    private const int MaxFailedAttempts = 5;
-    private bool _isLockedOut = false;
+    private int _failedAttempts;
+    private bool _isLockedOut;
 
     public event EventHandler<string>? AuthenticationStateChanged;
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public string AppVersion => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
+    /// <summary>
+    /// Gets the current application version.
+    /// </summary>
+    public string AppVersion => AppConstants.AppVersion;
 
     public AuthenticationViewModel(
         IFaceServiceClient faceServiceClient,
@@ -47,14 +50,15 @@ public class AuthenticationViewModel : INotifyPropertyChanged
         IAuthenticationService authenticationService,
         ILogger<AuthenticationViewModel>? logger = null)
     {
-        _faceServiceClient = faceServiceClient;
-        _cameraService = cameraService;
-        _authenticationService = authenticationService;
+        _faceServiceClient = faceServiceClient ?? throw new ArgumentNullException(nameof(faceServiceClient));
+        _cameraService = cameraService ?? throw new ArgumentNullException(nameof(cameraService));
+        _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
+        _pathService = new EnrollmentPathService();
         _logger = logger;
 
         _detectionTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(500) // Check every 500ms
+            Interval = TimeSpan.FromMilliseconds(AppConstants.DetectionTimerIntervalMs)
         };
         _detectionTimer.Tick += OnDetectionTimerTick;
         
@@ -70,11 +74,7 @@ public class AuthenticationViewModel : INotifyPropertyChanged
     /// </summary>
     private void CheckEnrollment()
     {
-        var enrollmentPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "MedSecureVision", "enrollment.dat");
-        
-        _hasEnrolledFaces = File.Exists(enrollmentPath);
+        _hasEnrolledFaces = _pathService.HasEnrollment();
     }
 
     /// <summary>
@@ -332,7 +332,7 @@ public class AuthenticationViewModel : INotifyPropertyChanged
                 ShowSuccessCheckmark = true;
                 
                 // Transition after delay
-                await Task.Delay(2000);
+                await Task.Delay(AppConstants.SuccessDelayMs);
             }
             else
             {
@@ -340,7 +340,7 @@ public class AuthenticationViewModel : INotifyPropertyChanged
                 AuthenticationState = "Failure";
                 StatusMessage = authResult.Error ?? "Face not recognized";
                 
-                if (_failedAttempts >= MaxFailedAttempts)
+                if (_failedAttempts >= AppConstants.MaxFailedAttempts)
                 {
                     _isLockedOut = true;
                     StatusMessage = "Too many attempts. Use PIN.";
@@ -349,7 +349,7 @@ public class AuthenticationViewModel : INotifyPropertyChanged
                 }
                 else
                 {
-                    await Task.Delay(2000);
+                    await Task.Delay(AppConstants.FailureDelayMs);
                     AuthenticationState = "Searching";
                     StatusMessage = "Please try again";
                     ScanningLineVisible = true;
@@ -367,22 +367,27 @@ public class AuthenticationViewModel : INotifyPropertyChanged
     /// <summary>
     /// Check if face is properly positioned within the frame.
     /// </summary>
-    private bool IsFaceProperlyPositioned(DetectedFace face)
+    /// <param name="face">The detected face to evaluate.</param>
+    /// <returns>True if face is properly positioned for authentication.</returns>
+    private static bool IsFaceProperlyPositioned(DetectedFace face)
     {
-        // Check if face is centered and properly sized
-        return face.Confidence > 0.7f && face.Width >= 100 && face.Width <= 500;
+        return face.Confidence > AppConstants.GoodFaceConfidence && 
+               face.Width >= AppConstants.MinFaceWidth && 
+               face.Width <= AppConstants.MaxFaceWidth;
     }
 
     /// <summary>
     /// Get positioning feedback message based on face detection.
     /// </summary>
-    private string GetPositioningMessage(DetectedFace face)
+    /// <param name="face">The detected face to evaluate.</param>
+    /// <returns>A user-friendly positioning message.</returns>
+    private static string GetPositioningMessage(DetectedFace face)
     {
-        if (face.Confidence < 0.5f)
+        if (face.Confidence < AppConstants.MinFaceConfidence)
             return "Face unclear - adjust lighting";
-        if (face.Width < 100)
+        if (face.Width < AppConstants.MinFaceWidth)
             return "Move closer to the camera";
-        if (face.Width > 500)
+        if (face.Width > AppConstants.MaxFaceWidth)
             return "Move back from the camera";
         return "Center your face in the frame";
     }

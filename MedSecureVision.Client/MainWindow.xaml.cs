@@ -5,6 +5,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using MedSecureVision.Client.Constants;
+using MedSecureVision.Client.Helpers;
 using MedSecureVision.Client.ViewModels;
 using MedSecureVision.Client.Views;
 using OpenCvSharp;
@@ -75,15 +77,15 @@ public partial class MainWindow : System.Windows.Window, IDisposable
                 return;
             }
 
-            // Configure camera
-            _videoCapture.Set(VideoCaptureProperties.FrameWidth, 640);
-            _videoCapture.Set(VideoCaptureProperties.FrameHeight, 480);
-            _videoCapture.Set(VideoCaptureProperties.Fps, 30);
+            // Configure camera using constants
+            _videoCapture.Set(VideoCaptureProperties.FrameWidth, AppConstants.CameraFrameWidth);
+            _videoCapture.Set(VideoCaptureProperties.FrameHeight, AppConstants.CameraFrameHeight);
+            _videoCapture.Set(VideoCaptureProperties.Fps, AppConstants.CameraFps);
 
             // Start capture timer
             _cameraTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(33) // ~30 FPS
+                Interval = TimeSpan.FromMilliseconds(AppConstants.CameraTimerIntervalMs)
             };
             _cameraTimer.Tick += CameraTimer_Tick;
             _cameraTimer.Start();
@@ -130,47 +132,18 @@ public partial class MainWindow : System.Windows.Window, IDisposable
             if (_videoCapture.Read(frame) && !frame.Empty())
             {
                 // Mirror image for natural viewing
-                Cv2.Flip(frame, frame, FlipMode.Y);
+                ImageHelper.FlipHorizontal(frame);
 
-                var bitmapSource = MatToBitmapSource(frame);
+                var bitmapSource = ImageHelper.MatToBitmapSource(frame);
                 if (bitmapSource != null)
                 {
                     CameraFeed.Source = bitmapSource;
                 }
             }
         }
-        catch { /* Ignore frame errors */ }
-    }
-
-    /// <summary>
-    /// Convert OpenCV Mat to WPF BitmapSource.
-    /// </summary>
-    private BitmapSource? MatToBitmapSource(Mat mat)
-    {
-        if (mat == null || mat.Empty())
-            return null;
-
-        try
-        {
-            int width = mat.Width;
-            int height = mat.Height;
-            int stride = (width * 3 + 3) & ~3;
-
-            byte[] pixels = new byte[height * stride];
-            for (int y = 0; y < height; y++)
-            {
-                System.Runtime.InteropServices.Marshal.Copy(mat.Ptr(y), pixels, y * stride, width * 3);
-            }
-
-            var bitmapSource = BitmapSource.Create(
-                width, height, 96, 96,
-                PixelFormats.Bgr24, null, pixels, stride);
-            bitmapSource.Freeze();
-            return bitmapSource;
-        }
         catch
         {
-            return null;
+            // Ignore individual frame capture errors to maintain smooth operation
         }
     }
 
@@ -211,43 +184,43 @@ public partial class MainWindow : System.Windows.Window, IDisposable
 
     private void UpdateUIForSearching()
     {
-        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0x58, 0xA6, 0xFF));
+        StatusDot.Fill = new SolidColorBrush(AppConstants.SearchingColor);
         StatusTitle.Text = "Looking for face...";
         StatusDescription.Text = "Position your face within the frame";
-        UpdateFaceGuideColor("#58A6FF");
+        UpdateFaceGuideColor(AppConstants.SearchingColorHex);
     }
 
     private void UpdateUIForPositioning()
     {
-        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xD2, 0x99, 0x22));
+        StatusDot.Fill = new SolidColorBrush(AppConstants.WarningColor);
         StatusTitle.Text = "Adjusting...";
         StatusDescription.Text = "Move closer and center your face";
-        UpdateFaceGuideColor("#D29922");
+        UpdateFaceGuideColor(AppConstants.WarningColorHex);
     }
 
     private void UpdateUIForVerifying()
     {
-        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xA3, 0x71, 0xF7));
+        StatusDot.Fill = new SolidColorBrush(AppConstants.VerifyingColor);
         StatusTitle.Text = "Verifying identity...";
         StatusDescription.Text = "Please hold still";
-        UpdateFaceGuideColor("#A371F7");
+        UpdateFaceGuideColor(AppConstants.VerifyingColorHex);
     }
 
     private void UpdateUIForLockedOut()
     {
-        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xF8, 0x51, 0x49));
+        StatusDot.Fill = new SolidColorBrush(AppConstants.ErrorColor);
         StatusTitle.Text = "Biometrics Locked";
         StatusDescription.Text = "Too many attempts. Use PIN to unlock.";
-        UpdateFaceGuideColor("#F85149");
+        UpdateFaceGuideColor(AppConstants.ErrorColorHex);
         StopCamera(); // Security measure
     }
 
     private void UpdateUIForNotEnrolled()
     {
-        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xD2, 0x99, 0x22));
+        StatusDot.Fill = new SolidColorBrush(AppConstants.WarningColor);
         StatusTitle.Text = "Not Enrolled";
         StatusDescription.Text = "Please setup Face ID from Dashboard";
-        UpdateFaceGuideColor("#D29922");
+        UpdateFaceGuideColor(AppConstants.WarningColorHex);
     }
 
     private void UpdateFaceGuideColor(string hexColor)
@@ -269,7 +242,7 @@ public partial class MainWindow : System.Windows.Window, IDisposable
 
     private void PlaySuccessAnimation()
     {
-        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50));
+        StatusDot.Fill = new SolidColorBrush(AppConstants.SuccessColor);
         StatusTitle.Text = "Welcome!";
         StatusDescription.Text = "Authentication successful";
 
@@ -290,12 +263,12 @@ public partial class MainWindow : System.Windows.Window, IDisposable
         scaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnimation);
         SuccessCheckmark.BeginAnimation(OpacityProperty, opacityAnimation);
 
-        UpdateFaceGuideColor("#3FB950");
+        UpdateFaceGuideColor(AppConstants.SuccessColorHex);
     }
 
     private void PlayFailureAnimation()
     {
-        StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xF8, 0x51, 0x49));
+        StatusDot.Fill = new SolidColorBrush(AppConstants.ErrorColor);
         StatusTitle.Text = "Not recognized";
         StatusDescription.Text = "Please try again or use PIN";
 
@@ -314,7 +287,7 @@ public partial class MainWindow : System.Windows.Window, IDisposable
         FaceGuideGlow.RenderTransform = transform;
         transform.BeginAnimation(TranslateTransform.XProperty, shakeAnimation);
 
-        UpdateFaceGuideColor("#F85149");
+        UpdateFaceGuideColor(AppConstants.ErrorColorHex);
     }
 
     #endregion

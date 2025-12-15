@@ -1,8 +1,8 @@
-using System.IO;
 using System.Threading;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MedSecureVision.Client.Constants;
 using MedSecureVision.Client.Services;
 using MedSecureVision.Client.ViewModels;
 using MedSecureVision.Client.Views;
@@ -32,7 +32,7 @@ public partial class App : Application
     private Mutex? _mutex;
     private SystemTrayService? _trayService;
     private MainWindow? _mainWindow;
-    private const string MutexName = "MedSecureVision_SingleInstance_Mutex";
+    private readonly IEnrollmentPathService _pathService = new EnrollmentPathService();
 
     /// <summary>
     /// Application startup handler.
@@ -44,8 +44,7 @@ public partial class App : Application
         // SINGLE INSTANCE CHECK
         // Prevents multiple instances of the application from running
         // ═══════════════════════════════════════════════════════════════
-        bool createdNew;
-        _mutex = new Mutex(true, MutexName, out createdNew);
+        _mutex = new Mutex(true, AppConstants.SingleInstanceMutexName, out bool createdNew);
         
         if (!createdNew)
         {
@@ -71,6 +70,7 @@ public partial class App : Application
                 services.AddHttpClient();
                 
                 // Core Services
+                services.AddSingleton<IEnrollmentPathService, EnrollmentPathService>();
                 services.AddSingleton<IFaceServiceClient, FaceServiceClient>();
                 services.AddSingleton<ICameraService, CameraService>();
                 services.AddSingleton<IAuthenticationService, AuthenticationService>();
@@ -107,10 +107,7 @@ public partial class App : Application
         );
 
         // Check initial enrollment status
-        var enrollmentPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "MedSecureVision", "enrollment.dat");
-        _trayService.SetEnrollmentStatus(File.Exists(enrollmentPath));
+        _trayService.SetEnrollmentStatus(_pathService.HasEnrollment());
 
         // ═══════════════════════════════════════════════════════════════
         // MAIN WINDOW

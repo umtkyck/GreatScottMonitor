@@ -2,6 +2,8 @@ using System.IO;
 using System.IO.Pipes;
 using System.Text;
 using System.Windows.Media.Imaging;
+using MedSecureVision.Client.Constants;
+using MedSecureVision.Client.Helpers;
 using MedSecureVision.Shared.Models;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
@@ -17,7 +19,6 @@ public class FaceServiceClient : IFaceServiceClient, IDisposable
 {
     private readonly ILogger<FaceServiceClient> _logger;
     private readonly FaceServiceOptions _options;
-    private const int BufferSize = 1024 * 1024; // 1MB buffer for images
     
     private bool _disposed;
 
@@ -76,7 +77,7 @@ public class FaceServiceClient : IFaceServiceClient, IDisposable
         }
     }
 
-    public async Task<FaceComparisonResult> CompareEmbeddingsAsync(float[] embedding1, float[] embedding2, float threshold = 0.6f)
+    public async Task<FaceComparisonResult> CompareEmbeddingsAsync(float[] embedding1, float[] embedding2, float threshold = AppConstants.FaceComparisonThreshold)
     {
         var similarity = CalculateCosineSimilarity(embedding1, embedding2);
         return await Task.FromResult(new FaceComparisonResult
@@ -92,7 +93,7 @@ public class FaceServiceClient : IFaceServiceClient, IDisposable
         try
         {
             var message = new IpcMessage { Command = "PING" };
-            var response = await SendMessageAsync(message, timeoutMs: 500);
+            var response = await SendMessageAsync(message, timeoutMs: AppConstants.PingTimeoutMs);
             return response.Success;
         }
         catch
@@ -106,9 +107,9 @@ public class FaceServiceClient : IFaceServiceClient, IDisposable
         return await IsConnectedAsync();
     }
 
-    private async Task<IpcResponse> SendMessageAsync(IpcMessage message, int timeoutMs = 2000)
+    private async Task<IpcResponse> SendMessageAsync(IpcMessage message, int timeoutMs = AppConstants.IpcTimeoutMs)
     {
-        var pipeName = _options.PipeName ?? @"\\.\pipe\MedSecureFaceService";
+        var pipeName = _options.PipeName ?? AppConstants.DefaultPipeName;
         using var client = new NamedPipeClientStream(".", pipeName.Replace(@"\\.\pipe\", ""), PipeDirection.InOut, PipeOptions.Asynchronous);
 
         await client.ConnectAsync(timeoutMs);
@@ -118,20 +119,16 @@ public class FaceServiceClient : IFaceServiceClient, IDisposable
         await client.WriteAsync(bytes, 0, bytes.Length);
         await client.FlushAsync();
 
-        using var reader = new StreamReader(client, Encoding.UTF8, false, BufferSize, leaveOpen: true);
+        using var reader = new StreamReader(client, Encoding.UTF8, false, AppConstants.IpcBufferSize, leaveOpen: true);
         var responseJson = await reader.ReadToEndAsync();
 
         return JsonConvert.DeserializeObject<IpcResponse>(responseJson) 
             ?? new IpcResponse { Success = false, Error = "Empty response" };
     }
 
-    private string ConvertFrameToBase64(BitmapSource frame)
+    private static string ConvertFrameToBase64(BitmapSource frame)
     {
-        var encoder = new JpegBitmapEncoder { QualityLevel = 80 }; 
-        encoder.Frames.Add(BitmapFrame.Create(frame));
-        using var ms = new MemoryStream();
-        encoder.Save(ms);
-        return Convert.ToBase64String(ms.ToArray());
+        return ImageHelper.BitmapSourceToBase64(frame, 80);
     }
 
     private FaceDetectionResult ParseDetectionResponse(IpcResponse response)
@@ -199,7 +196,13 @@ public class FaceServiceClient : IFaceServiceClient, IDisposable
     }
 }
 
+/// <summary>
+/// Configuration options for the face service client.
+/// </summary>
 public class FaceServiceOptions
 {
-    public string? PipeName { get; set; } = @"\\.\pipe\MedSecureFaceService";
+    /// <summary>
+    /// Named pipe path for face service communication.
+    /// </summary>
+    public string? PipeName { get; set; } = AppConstants.DefaultPipeName;
 }

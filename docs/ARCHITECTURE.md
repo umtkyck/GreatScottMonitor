@@ -238,3 +238,7 @@ MedSecure Vision is a HIPAA-compliant biometric authentication system for health
 - Breach notification procedures documented
 
 
+
+
+
+

@@ -6,12 +6,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
+using MedSecureVision.Client.Constants;
+using MedSecureVision.Client.Models;
+using MedSecureVision.Client.Services;
 
 // Resolve WPF vs WinForms/System.Drawing ambiguities
 using Color = System.Windows.Media.Color;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
-using Point = System.Windows.Point;
 using Button = System.Windows.Controls.Button;
 using Border = System.Windows.Controls.Border;
 
@@ -19,21 +21,29 @@ namespace MedSecureVision.Client.Views;
 
 /// <summary>
 /// Modern dashboard for managing enrolled faces.
+/// Provides face management, statistics, and quick actions.
 /// </summary>
 public partial class DashboardWindow : Window
 {
+    /// <summary>
+    /// Collection of enrolled faces displayed in the dashboard.
+    /// </summary>
     public ObservableCollection<EnrolledFaceModel> EnrolledFaces { get; } = new();
-    public string AppVersion => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
-    private readonly string _enrollmentDirectory;
+    
+    /// <summary>
+    /// Current application version for display.
+    /// </summary>
+    public string AppVersion => AppConstants.AppVersion;
+    
+    private readonly IEnrollmentPathService _pathService;
 
+    /// <summary>
+    /// Creates a new DashboardWindow instance.
+    /// </summary>
     public DashboardWindow()
     {
         InitializeComponent();
-        
-        _enrollmentDirectory = System.IO.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "MedSecureVision", "Faces");
-        
+        _pathService = new EnrollmentPathService();
         Loaded += DashboardWindow_Loaded;
     }
 
@@ -159,34 +169,20 @@ public partial class DashboardWindow : Window
     /// <summary>
     /// Actually delete the face data file.
     /// </summary>
+    /// <param name="id">The face ID to delete.</param>
+    /// <exception cref="InvalidOperationException">Thrown when deletion fails.</exception>
     private void DoDeleteFace(string id)
     {
-        try
+        if (string.IsNullOrWhiteSpace(id))
         {
-            if (id == "primary")
-            {
-                var primaryPath = System.IO.Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "MedSecureVision", "enrollment.dat");
-                
-                if (System.IO.File.Exists(primaryPath))
-                {
-                    System.IO.File.Delete(primaryPath);
-                }
-            }
-            else
-            {
-                var facePath = System.IO.Path.Combine(_enrollmentDirectory, $"{id}.dat");
-                if (System.IO.File.Exists(facePath))
-                {
-                    System.IO.File.Delete(facePath);
-                }
-            }
+            throw new ArgumentException("Face ID cannot be null or empty.", nameof(id));
         }
-        catch (Exception ex)
+
+        var deleted = _pathService.DeleteFace(id);
+        
+        if (!deleted)
         {
-            System.Diagnostics.Debug.WriteLine($"Delete error: {ex.Message}");
-            throw;
+            System.Diagnostics.Debug.WriteLine($"Face not found or could not be deleted: {id}");
         }
     }
 
@@ -261,43 +257,17 @@ public partial class DashboardWindow : Window
         EnrolledFaces.Clear();
 
         // Check for primary enrollment
-        var enrollmentPath = System.IO.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "MedSecureVision", "enrollment.dat");
-
-        if (System.IO.File.Exists(enrollmentPath))
+        if (_pathService.HasEnrollment())
         {
             try
             {
-                var enrollmentData = System.IO.File.ReadAllText(enrollmentPath);
-                var enrolledAt = DateTime.Now.AddDays(-3);
-
-                foreach (var line in enrollmentData.Split('\n'))
-                {
-                    if (line.StartsWith("EnrolledAt="))
-                    {
-                        var dateStr = line.Substring("EnrolledAt=".Length).Trim();
-                        if (DateTime.TryParse(dateStr, out var date))
-                        {
-                            enrolledAt = date;
-                        }
-                    }
-                }
-
-                EnrolledFaces.Add(new EnrolledFaceModel
-                {
-                    Id = "primary",
-                    Name = Environment.UserName,
-                    Initials = GetInitials(Environment.UserName),
-                    Role = "Primary User",
-                    EnrolledDate = enrolledAt.ToString("MMM dd, yyyy"),
-                    Status = FaceStatus.Active,
-                    Quality = 0.95f
-                });
+                var enrollmentData = File.ReadAllText(_pathService.PrimaryEnrollmentPath);
+                var faceModel = EnrolledFaceModel.FromEnrollmentData("primary", enrollmentData);
+                EnrolledFaces.Add(faceModel);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Load error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Load enrollment error: {ex.Message}");
             }
         }
 
@@ -305,18 +275,6 @@ public partial class DashboardWindow : Window
         FacesGrid.ItemsSource = null;
         FacesGrid.ItemsSource = EnrolledFaces;
         UpdateUIVisibility();
-    }
-
-    private string GetInitials(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name)) return "??";
-        
-        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length >= 2)
-            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
-        else if (parts.Length == 1 && parts[0].Length >= 2)
-            return parts[0].Substring(0, 2).ToUpper();
-        return "??";
     }
 
     private void UpdateStatistics()
@@ -342,47 +300,15 @@ public partial class DashboardWindow : Window
         
         if (hasEnrollment)
         {
-            StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50));
+            StatusDot.Fill = new SolidColorBrush(AppConstants.SuccessColor);
             StatusText.Text = "System Active";
         }
         else
         {
-            StatusDot.Fill = new SolidColorBrush(Color.FromRgb(0xD2, 0x99, 0x22));
+            StatusDot.Fill = new SolidColorBrush(AppConstants.WarningColor);
             StatusText.Text = "No Enrollment";
         }
     }
 }
 
-public class EnrolledFaceModel
-{
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string Initials { get; set; } = "";
-    public string Role { get; set; } = "";
-    public string EnrolledDate { get; set; } = "";
-    public FaceStatus Status { get; set; } = FaceStatus.Active;
-    public float Quality { get; set; }
-
-    public string StatusText => Status switch
-    {
-        FaceStatus.Active => "Active",
-        FaceStatus.Expired => "Expired",
-        FaceStatus.Pending => "Pending",
-        _ => "Unknown"
-    };
-
-    public SolidColorBrush StatusColor => Status switch
-    {
-        FaceStatus.Active => new SolidColorBrush(Color.FromRgb(0x23, 0x86, 0x36)),
-        FaceStatus.Expired => new SolidColorBrush(Color.FromRgb(0xB0, 0x40, 0x38)),
-        FaceStatus.Pending => new SolidColorBrush(Color.FromRgb(0x9E, 0x6A, 0x03)),
-        _ => new SolidColorBrush(Color.FromRgb(0x48, 0x4F, 0x58))
-    };
-}
-
-public enum FaceStatus
-{
-    Active,
-    Expired,
-    Pending
-}
+// EnrolledFaceModel and FaceStatus moved to MedSecureVision.Client.Models namespace

@@ -1,9 +1,10 @@
 using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
+using MedSecureVision.Client.Constants;
+using MedSecureVision.Client.Views;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
-using MedSecureVision.Client.Views;
 
 namespace MedSecureVision.Client.Services;
 
@@ -57,7 +58,7 @@ public class SystemTrayService : IDisposable
         _contextMenu.Renderer = new DarkMenuRenderer();
 
         // Add menu items
-        var statusItem = new ToolStripMenuItem("● MedSecure Vision v1.0.0")
+        var statusItem = new ToolStripMenuItem($"● {AppConstants.AppName} v{AppConstants.AppVersion}")
         {
             Enabled = false,
             ForeColor = Color.FromArgb(88, 166, 255)
@@ -209,7 +210,7 @@ public class SystemTrayService : IDisposable
 
         foreach (ToolStripItem item in _contextMenu.Items)
         {
-            if (item is ToolStripMenuItem menuItem && menuItem.Text.Contains("Service"))
+            if (item is ToolStripMenuItem menuItem && menuItem.Text?.Contains("Service") == true)
             {
                 foreach (ToolStripItem subItem in menuItem.DropDownItems)
                 {
