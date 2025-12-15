@@ -44,11 +44,11 @@ New-Item -ItemType Directory -Path $PackageDir | Out-Null
 
 Write-Host "[INFO] Building Release configuration..." -ForegroundColor Yellow
 Set-Location $ProjectRoot
-dotnet publish MedSecureVision.Client/MedSecureVision.Client.csproj -c Release -o "$PackageDir\Client" --self-contained false
-dotnet publish MedSecureVision.Backend/MedSecureVision.Backend.csproj -c Release -o "$PackageDir\Backend" --self-contained false
+dotnet publish CXA.Client/CXA.Client.csproj -c Release -o "$PackageDir\Client" --self-contained false
+dotnet publish CXA.Backend/CXA.Backend.csproj -c Release -o "$PackageDir\Backend" --self-contained false
 
 Write-Host "[INFO] Copying Face Service..." -ForegroundColor Yellow
-Copy-Item -Recurse "$ProjectRoot\MedSecureVision.FaceService" "$PackageDir\FaceService"
+Copy-Item -Recurse "$ProjectRoot\CXA.FaceService" "$PackageDir\FaceService"
 Remove-Item -Recurse -Force "$PackageDir\FaceService\venv" -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force "$PackageDir\FaceService\__pycache__" -ErrorAction SilentlyContinue
 
@@ -119,11 +119,11 @@ pause
 @echo off
 title CXA
 echo Starting CXA...
-start "Backend" cmd /k "cd /d %~dp0Backend && dotnet MedSecureVision.Backend.dll"
+start "Backend" cmd /k "cd /d %~dp0Backend && dotnet CXA.Backend.dll"
 timeout /t 3 /nobreak > nul
 start "FaceService" cmd /k "cd /d %~dp0FaceService && venv\Scripts\python.exe main.py"
 timeout /t 5 /nobreak > nul
-start "" "%~dp0Client\MedSecureVision.Client.exe"
+start "" "%~dp0Client\CXA.Client.exe"
 echo All services started!
 "@ | Out-File -FilePath "$PackageDir\Start-CXA.bat" -Encoding ASCII
 
@@ -131,8 +131,8 @@ echo All services started!
 @"
 @echo off
 echo Stopping CXA...
-taskkill /IM "MedSecureVision.Client.exe" /F 2>nul
-taskkill /IM "MedSecureVision.Backend.exe" /F 2>nul
+taskkill /IM "CXA.Client.exe" /F 2>nul
+taskkill /IM "CXA.Backend.exe" /F 2>nul
 taskkill /IM "python.exe" /F 2>nul
 echo Done.
 "@ | Out-File -FilePath "$PackageDir\Stop-CXA.bat" -Encoding ASCII

@@ -19,15 +19,15 @@ Write-Host @"
 
 # Stop Client
 Write-Host "[1/3] Stopping Client Application..." -ForegroundColor Yellow
-Get-Process -Name "MedSecureVision.Client" -ErrorAction SilentlyContinue | Stop-Process -Force
+Get-Process -Name "CXA.Client" -ErrorAction SilentlyContinue | Stop-Process -Force
 Write-Host "[OK] Client stopped" -ForegroundColor Green
 
 # Stop Backend
 Write-Host "[2/3] Stopping Backend API..." -ForegroundColor Yellow
-Get-Process -Name "MedSecureVision.Backend" -ErrorAction SilentlyContinue | Stop-Process -Force
+Get-Process -Name "CXA.Backend" -ErrorAction SilentlyContinue | Stop-Process -Force
 # Also try to stop any dotnet processes running the backend
 Get-Process -Name "dotnet" -ErrorAction SilentlyContinue | Where-Object {
-    $_.MainWindowTitle -like "*Backend*" -or $_.CommandLine -like "*MedSecureVision.Backend*"
+    $_.MainWindowTitle -like "*Backend*" -or $_.CommandLine -like "*CXA.Backend*"
 } | Stop-Process -Force -ErrorAction SilentlyContinue
 Write-Host "[OK] Backend stopped" -ForegroundColor Green
 

@@ -15,12 +15,12 @@ echo.
 
 :: Start Backend API
 echo [1/3] Starting Backend API...
-start "CXA - Backend API" cmd /k "cd /d %~dp0MedSecureVision.Backend && dotnet run"
+start "CXA - Backend API" cmd /k "cd /d %~dp0CXA.Backend && dotnet run"
 timeout /t 3 /nobreak > nul
 
 :: Start Face Service
 echo [2/3] Starting Face Service...
-cd /d %~dp0MedSecureVision.FaceService
+cd /d %~dp0CXA.FaceService
 if not exist venv (
     echo [INFO] Creating Python virtual environment...
     python -m venv venv
@@ -29,13 +29,13 @@ if not exist venv (
 ) else (
     call venv\Scripts\activate.bat
 )
-start "CXA - Face Service" cmd /k "cd /d %~dp0MedSecureVision.FaceService && venv\Scripts\python.exe main.py"
+start "CXA - Face Service" cmd /k "cd /d %~dp0CXA.FaceService && venv\Scripts\python.exe main.py"
 timeout /t 5 /nobreak > nul
 
 :: Start Client
 echo [3/3] Starting Client Application...
-cd /d %~dp0MedSecureVision.Client
-start "" "bin\Debug\net8.0-windows\MedSecureVision.Client.exe"
+cd /d %~dp0CXA.Client
+start "" "bin\Debug\net8.0-windows\CXA.Client.exe"
 
 echo.
 echo  ========================================================

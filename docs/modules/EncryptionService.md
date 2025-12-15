@@ -126,7 +126,7 @@ The `EncryptionService` provides FIPS 140-2 compliant encryption for biometric f
 
 ### Namespace
 ```csharp
-MedSecureVision.Backend.Services
+CXA.Backend.Services
 ```
 
 ### Class Declaration

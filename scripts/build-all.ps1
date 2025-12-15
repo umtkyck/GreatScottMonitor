@@ -118,12 +118,12 @@ Write-Header "Building .NET Solution"
 Set-Location $ProjectRoot
 
 Write-Info "Restoring NuGet packages..."
-dotnet restore MedSecureVision.sln
+dotnet restore CXA.sln
 if ($LASTEXITCODE -ne 0) { Write-Error "NuGet restore failed"; exit 1 }
 Write-Success "Packages restored"
 
 Write-Info "Building solution ($Configuration)..."
-dotnet build MedSecureVision.sln --configuration $Configuration --no-restore
+dotnet build CXA.sln --configuration $Configuration --no-restore
 if ($LASTEXITCODE -ne 0) { Write-Error "Build failed"; exit 1 }
 Write-Success "Solution built successfully"
 
@@ -134,7 +134,7 @@ Write-Success "Solution built successfully"
 Write-Header "Running Unit Tests"
 
 Write-Info "Executing tests..."
-dotnet test MedSecureVision.Tests/MedSecureVision.Tests.csproj --configuration $Configuration --no-build --verbosity normal
+dotnet test CXA.Tests/CXA.Tests.csproj --configuration $Configuration --no-build --verbosity normal
 if ($LASTEXITCODE -ne 0) { 
     Write-Error "Some tests failed"
     # Continue anyway for build purposes
@@ -159,7 +159,7 @@ New-Item -ItemType Directory -Path $publishDir | Out-Null
 # Publish Client
 Write-Info "Publishing WPF Client..."
 $clientPublishDir = Join-Path $publishDir "Client"
-dotnet publish MedSecureVision.Client/MedSecureVision.Client.csproj `
+dotnet publish CXA.Client/CXA.Client.csproj `
     --configuration $Configuration `
     --output $clientPublishDir `
     --self-contained false `
@@ -170,7 +170,7 @@ Write-Success "Client published to: $clientPublishDir"
 # Publish Backend
 Write-Info "Publishing Backend API..."
 $backendPublishDir = Join-Path $publishDir "Backend"
-dotnet publish MedSecureVision.Backend/MedSecureVision.Backend.csproj `
+dotnet publish CXA.Backend/CXA.Backend.csproj `
     --configuration $Configuration `
     --output $backendPublishDir `
     --self-contained false
@@ -184,7 +184,7 @@ Write-Success "Backend published to: $backendPublishDir"
 if (-not $SkipPython) {
     Write-Header "Setting Up Python Environment"
     
-    $pythonDir = Join-Path $ProjectRoot "MedSecureVision.FaceService"
+    $pythonDir = Join-Path $ProjectRoot "CXA.FaceService"
     $venvDir = Join-Path $pythonDir "venv"
     
     Set-Location $pythonDir
@@ -216,7 +216,7 @@ if (-not $SkipPython) {
 if (-not $SkipNode) {
     Write-Header "Building React Admin Console"
     
-    $adminDir = Join-Path $ProjectRoot "MedSecureVision.AdminConsole"
+    $adminDir = Join-Path $ProjectRoot "CXA.AdminConsole"
     Set-Location $adminDir
     
     Write-Info "Installing npm dependencies..."
@@ -248,7 +248,7 @@ echo Starting CXA Services...
 echo.
 
 echo [1/3] Starting Backend API...
-start "CXA Backend" cmd /k "cd /d %~dp0Backend && dotnet MedSecureVision.Backend.dll"
+start "CXA Backend" cmd /k "cd /d %~dp0Backend && dotnet CXA.Backend.dll"
 timeout /t 3 /nobreak > nul
 
 echo [2/3] Starting Face Service...
@@ -256,7 +256,7 @@ start "CXA FaceService" cmd /k "cd /d %~dp0FaceService && venv\Scripts\python.ex
 timeout /t 5 /nobreak > nul
 
 echo [3/3] Starting Client Application...
-start "" "%~dp0Client\MedSecureVision.Client.exe"
+start "" "%~dp0Client\CXA.Client.exe"
 
 echo.
 echo All services started!
@@ -269,8 +269,8 @@ $startAllScript | Out-File -FilePath (Join-Path $publishDir "Start-All.bat") -En
 $stopAllScript = @'
 @echo off
 echo Stopping CXA Services...
-taskkill /IM "MedSecureVision.Client.exe" /F 2>nul
-taskkill /IM "MedSecureVision.Backend.exe" /F 2>nul
+taskkill /IM "CXA.Client.exe" /F 2>nul
+taskkill /IM "CXA.Backend.exe" /F 2>nul
 taskkill /IM "python.exe" /F 2>nul
 echo Services stopped.
 pause

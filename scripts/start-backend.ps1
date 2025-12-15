@@ -25,7 +25,7 @@ param(
 $ErrorActionPreference = "Stop"
 $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = Split-Path -Parent $ScriptRoot
-$BackendDir = Join-Path $ProjectRoot "MedSecureVision.Backend"
+$BackendDir = Join-Path $ProjectRoot "CXA.Backend"
 
 Write-Host @"
 

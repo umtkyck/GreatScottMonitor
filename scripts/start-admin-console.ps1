@@ -20,7 +20,7 @@ param(
 $ErrorActionPreference = "Stop"
 $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = Split-Path -Parent $ScriptRoot
-$AdminDir = Join-Path $ProjectRoot "MedSecureVision.AdminConsole"
+$AdminDir = Join-Path $ProjectRoot "CXA.AdminConsole"
 
 Write-Host @"
 

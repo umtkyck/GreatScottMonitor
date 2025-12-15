@@ -47,7 +47,7 @@ Write-Host @"
 if ($Build) {
     Write-Host "[INFO] Building solution..." -ForegroundColor Yellow
     Set-Location $ProjectRoot
-    dotnet build MedSecureVision.sln --configuration Debug
+    dotnet build CXA.sln --configuration Debug
     if ($LASTEXITCODE -ne 0) {
         Write-Host "[ERROR] Build failed" -ForegroundColor Red
         exit 1

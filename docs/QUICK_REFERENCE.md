@@ -71,13 +71,13 @@
 
 **Run Backend**
 ```bash
-cd MedSecureVision.Backend
+cd CXA.Backend
 dotnet run
 ```
 
 **Run Python Service**
 ```bash
-cd MedSecureVision.FaceService
+cd CXA.FaceService
 python main.py
 ```
 
@@ -95,10 +95,10 @@ dotnet build
 
 | Component | Location |
 |-----------|----------|
-| Client Config | `MedSecureVision.Client/appsettings.json` |
-| Backend Config | `MedSecureVision.Backend/appsettings.json` |
-| Python Requirements | `MedSecureVision.FaceService/requirements.txt` |
-| Database Migrations | `MedSecureVision.Backend/Migrations/` |
+| Client Config | `CXA.Client/appsettings.json` |
+| Backend Config | `CXA.Backend/appsettings.json` |
+| Python Requirements | `CXA.FaceService/requirements.txt` |
+| Database Migrations | `CXA.Backend/Migrations/` |
 
 ### API Endpoints
 

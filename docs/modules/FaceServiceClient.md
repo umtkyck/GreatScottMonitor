@@ -84,7 +84,7 @@ The `FaceServiceClient` class provides a robust communication interface between 
 
 ### Namespace
 ```csharp
-MedSecureVision.Client.Services
+CXA.Client.Services
 ```
 
 ### Class Declaration
@@ -226,7 +226,7 @@ public class FaceServiceOptions
 ```json
 {
   "FaceService": {
-    "PipeName": "\\\\.\\pipe\\MedSecureFaceService"
+    "PipeName": "\\\\.\\pipe\\CXAFaceService"
   }
 }
 ```

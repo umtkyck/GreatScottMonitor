@@ -26,7 +26,7 @@ docker-compose up -d postgres
 
 ### 2. Configure Backend
 
-Edit `MedSecureVision.Backend/appsettings.json`:
+Edit `CXA.Backend/appsettings.json`:
 
 ```json
 {
@@ -48,7 +48,7 @@ Edit `MedSecureVision.Backend/appsettings.json`:
 ### 3. Run Database Migrations
 
 ```bash
-cd MedSecureVision.Backend
+cd CXA.Backend
 dotnet ef database update
 ```
 
@@ -65,7 +65,7 @@ Backend will be available at `https://localhost:5001`
 ### 1. Install Dependencies
 
 ```bash
-cd MedSecureVision.FaceService
+cd CXA.FaceService
 pip install -r requirements.txt
 ```
 
@@ -83,12 +83,12 @@ The service will create a named pipe at `\\.\pipe\CXAFaceService`
 
 ### 1. Configure Client
 
-Edit `MedSecureVision.Client/appsettings.json`:
+Edit `CXA.Client/appsettings.json`:
 
 ```json
 {
   "FaceService": {
-    "PipeName": "\\\\.\\pipe\\MedSecureFaceService"
+    "PipeName": "\\\\.\\pipe\\CXAFaceService"
   },
   "BackendApi": {
     "BaseUrl": "https://localhost:5001"
@@ -103,7 +103,7 @@ Edit `MedSecureVision.Client/appsettings.json`:
 ### 2. Build Client
 
 ```bash
-cd MedSecureVision.Client
+cd CXA.Client
 dotnet build -c Release
 ```
 
@@ -131,7 +131,7 @@ REACT_APP_API_URL=https://localhost:5001
 ### 2. Install Dependencies
 
 ```bash
-cd MedSecureVision.AdminConsole
+cd CXA.AdminConsole
 npm install
 ```
 

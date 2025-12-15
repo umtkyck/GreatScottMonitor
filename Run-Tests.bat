@@ -16,7 +16,7 @@ echo.
 :: Run tests
 echo [INFO] Running tests...
 echo.
-dotnet test MedSecureVision.Tests\MedSecureVision.Tests.csproj --configuration Release --verbosity normal
+dotnet test CXA.Tests\CXA.Tests.csproj --configuration Release --verbosity normal
 
 echo.
 if %ERRORLEVEL% equ 0 (

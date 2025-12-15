@@ -61,7 +61,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed backend installation instruction
 
 ### Client Configuration
 
-Edit `MedSecureVision.Client/appsettings.json`:
+Edit `CXA.Client/appsettings.json`:
 
 ```json
 {
@@ -84,7 +84,7 @@ Edit `MedSecureVision.Client/appsettings.json`:
 
 ### Backend Configuration
 
-Edit `MedSecureVision.Backend/appsettings.json`:
+Edit `CXA.Backend/appsettings.json`:
 
 ```json
 {
@@ -337,7 +337,7 @@ Monitor for:
 #### Client Diagnostics
 
 - Check system tray icon status
-- Review client logs: `%AppData%\MedSecureVision\logs`
+- Review client logs: `%AppData%\CXA\logs`
 - Use "View Diagnostics" from system tray menu
 
 #### Backend Diagnostics

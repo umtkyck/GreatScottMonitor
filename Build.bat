@@ -24,7 +24,7 @@ if %ERRORLEVEL% neq 0 (
 
 :: Build solution
 echo [INFO] Building .NET Solution...
-dotnet build MedSecureVision.sln --configuration Release
+dotnet build CXA.sln --configuration Release
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] Build failed!
     pause

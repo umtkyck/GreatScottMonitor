@@ -284,7 +284,7 @@
 ### Step 2: Review Logs
 
 **Client Logs:**
-- Location: `%AppData%\MedSecureVision\logs`
+- Location: `%AppData%\CXA\logs`
 - Check for error messages
 - Look for patterns
 

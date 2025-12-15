@@ -22,8 +22,8 @@
 ### Clone Repository
 
 ```bash
-git clone https://github.com/your-org/MedSecureVision.git
-cd MedSecureVision
+git clone https://github.com/your-org/CXA.git
+cd CXA
 ```
 
 ## Architecture Overview
@@ -79,7 +79,7 @@ cd MedSecureVision
 ### 1. Backend Setup
 
 ```bash
-cd MedSecureVision.Backend
+cd CXA.Backend
 
 # Install dependencies
 dotnet restore
@@ -97,7 +97,7 @@ Backend will be available at `https://localhost:5001`
 ### 2. Python Face Service Setup
 
 ```bash
-cd MedSecureVision.FaceService
+cd CXA.FaceService
 
 # Create virtual environment
 python -m venv venv
@@ -115,7 +115,7 @@ python main.py
 ### 3. Client Setup
 
 ```bash
-cd MedSecureVision.Client
+cd CXA.Client
 
 # Restore packages
 dotnet restore
@@ -130,7 +130,7 @@ dotnet run
 ### 4. Admin Console Setup
 
 ```bash
-cd MedSecureVision.AdminConsole
+cd CXA.AdminConsole
 
 # Install dependencies
 npm install
@@ -148,7 +148,7 @@ npm start
 ### Client (WPF)
 
 ```
-MedSecureVision.Client/
+CXA.Client/
 ├── Services/          # Business logic services
 │   ├── FaceServiceClient.cs      # Python service communication
 │   ├── CameraService.cs           # Webcam capture
@@ -167,7 +167,7 @@ MedSecureVision.Client/
 ### Python Face Service
 
 ```
-MedSecureVision.FaceService/
+CXA.FaceService/
 ├── main.py            # Entry point
 ├── face_detector.py   # MediaPipe wrapper
 ├── face_recognizer.py # InsightFace wrapper
@@ -184,7 +184,7 @@ MedSecureVision.FaceService/
 ### Backend API
 
 ```
-MedSecureVision.Backend/
+CXA.Backend/
 ├── Controllers/       # API endpoints
 ├── Services/          # Business logic
 ├── Models/            # Entity models
@@ -206,7 +206,7 @@ MedSecureVision.Backend/
 dotnet test
 
 # Run specific test project
-dotnet test MedSecureVision.Tests
+dotnet test CXA.Tests
 
 # Run with coverage
 dotnet test /p:CollectCoverage=true
@@ -215,7 +215,7 @@ dotnet test /p:CollectCoverage=true
 ### Test Structure
 
 ```
-MedSecureVision.Tests/
+CXA.Tests/
 ├── FaceDetectionTests.cs
 ├── FaceEmbeddingTests.cs
 ├── EncryptionServiceTests.cs
@@ -344,7 +344,7 @@ Longer description if needed
    - Press F5 to start debugging
 
 2. **View Logs**
-   - Check `%AppData%\MedSecureVision\logs`
+   - Check `%AppData%\CXA\logs`
    - Or use Application Insights
 
 3. **Named Pipe Debugging**

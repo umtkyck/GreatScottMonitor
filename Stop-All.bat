@@ -14,7 +14,7 @@ echo  ========================================================
 echo.
 
 echo [1/3] Stopping Client Application...
-taskkill /IM "MedSecureVision.Client.exe" /F 2>nul
+taskkill /IM "CXA.Client.exe" /F 2>nul
 if %ERRORLEVEL% equ 0 (
     echo        [OK] Client stopped
 ) else (
@@ -22,7 +22,7 @@ if %ERRORLEVEL% equ 0 (
 )
 
 echo [2/3] Stopping Backend API...
-taskkill /IM "MedSecureVision.Backend.exe" /F 2>nul
+taskkill /IM "CXA.Backend.exe" /F 2>nul
 :: Also stop dotnet processes that might be running the backend
 for /f "tokens=2" %%a in ('tasklist /fi "WINDOWTITLE eq CXA - Backend*" /fo csv /nh') do (
     taskkill /PID %%~a /F 2>nul

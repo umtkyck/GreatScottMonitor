@@ -117,7 +117,7 @@ git merge feature/face-enrollment
 ```bash
 # Make changes to a file
 # Stage changes
-git add MedSecureVision.Client/Services/FaceServiceClient.cs
+git add CXA.Client/Services/FaceServiceClient.cs
 
 # Commit with descriptive message
 git commit -m "docs: Add XML documentation to FaceServiceClient methods
@@ -128,7 +128,7 @@ git commit -m "docs: Add XML documentation to FaceServiceClient methods
 - Add return value descriptions"
 
 # Continue working...
-git add MedSecureVision.Client/Services/PresenceMonitorService.cs
+git add CXA.Client/Services/PresenceMonitorService.cs
 git commit -m "docs: Add XML documentation to PresenceMonitorService
 
 - Document presence monitoring logic
@@ -177,7 +177,7 @@ git add path/to/file.cs
 git add .
 
 # Stage all changes in directory
-git add MedSecureVision.Client/
+git add CXA.Client/
 ```
 
 ### Committing
@@ -236,7 +236,7 @@ git diff --staged
 ### Add Remote
 
 ```bash
-git remote add origin https://github.com/your-org/MedSecureVision.git
+git remote add origin https://github.com/your-org/CXA.git
 ```
 
 ### Push to Remote

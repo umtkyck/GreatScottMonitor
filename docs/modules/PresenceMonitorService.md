@@ -90,7 +90,7 @@ The `PresenceMonitorService` provides continuous real-time monitoring of user pr
 
 ### Namespace
 ```csharp
-MedSecureVision.Client.Services
+CXA.Client.Services
 ```
 
 ### Class Declaration

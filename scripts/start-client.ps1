@@ -26,7 +26,7 @@ param(
 $ErrorActionPreference = "Stop"
 $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = Split-Path -Parent $ScriptRoot
-$ClientDir = Join-Path $ProjectRoot "MedSecureVision.Client"
+$ClientDir = Join-Path $ProjectRoot "CXA.Client"
 
 Write-Host @"
 
@@ -55,7 +55,7 @@ if (-not $NoBuild) {
 }
 
 # Find and run the executable
-$exePath = Join-Path $ClientDir "bin\$Configuration\net8.0-windows\MedSecureVision.Client.exe"
+$exePath = Join-Path $ClientDir "bin\$Configuration\net8.0-windows\CXA.Client.exe"
 
 if (Test-Path $exePath) {
     Write-Host "[INFO] Starting client application..." -ForegroundColor Green
