@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide explains the Git workflow for MedSecure Vision project. All commits should be in English.
+This guide explains the Git workflow for CXA project. All commits should be in English.
 
 ## Initial Setup
 

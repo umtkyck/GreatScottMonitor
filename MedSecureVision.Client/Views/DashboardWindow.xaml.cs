@@ -311,4 +311,4 @@ public partial class DashboardWindow : Window
     }
 }
 
-// EnrolledFaceModel and FaceStatus moved to MedSecureVision.Client.Models namespace
+// EnrolledFaceModel and FaceStatus are in the Models namespace

@@ -1,12 +1,12 @@
-# MedSecure Vision - Scripts
+# CXA - Scripts
 
 <div align="center">
 
-![MedSecure Vision](https://img.shields.io/badge/MedSecure-Vision-blue?style=for-the-badge)
+![CXA](https://img.shields.io/badge/CXA-R1M1-blue?style=for-the-badge)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1+-blue?style=for-the-badge)
 ![Batch](https://img.shields.io/badge/Batch-Windows-green?style=for-the-badge)
 
-**Build, Deploy, and Run Scripts for MedSecure Vision**
+**Build, Deploy, and Run Scripts for CXA**
 
 </div>
 
@@ -23,7 +23,7 @@
 | `start-faceservice.ps1` | Start Python Face Service only | `.\start-faceservice.ps1` |
 | `start-client.ps1` | Start WPF Client only | `.\start-client.ps1` |
 | `start-admin-console.ps1` | Start React Admin Console | `.\start-admin-console.ps1` |
-| `create-installer.ps1` | Create deployment package | `.\create-installer.ps1 -Version "1.0.0"` |
+| `create-installer.ps1` | Create deployment package | `.\create-installer.ps1 -Version "R1M1"` |
 
 ---
 
@@ -122,15 +122,15 @@ Creates a deployment package ZIP file.
 **Output:**
 ```
 installer/
-├── MedSecureVision-1.0.0/
+├── CXA-R1M1/
 │   ├── Client/
 │   ├── Backend/
 │   ├── FaceService/
 │   ├── docs/
 │   ├── Install.bat
-│   ├── Start-MedSecure.bat
-│   └── Stop-MedSecure.bat
-└── MedSecureVision-1.0.0.zip
+│   ├── Start-CXA.bat
+│   └── Stop-CXA.bat
+└── CXA-R1M1.zip
 ```
 
 ---
@@ -176,9 +176,9 @@ For quick access, use the batch files in the project root:
 
 <div align="center">
 
-**MedSecure Vision** - HIPAA-Compliant Biometric Authentication
+**CXA** - Biometric Authentication
 
-*© 2024 MedSecure Vision. All rights reserved.*
+*© 2024 CXA. All rights reserved.*
 
 </div>
 

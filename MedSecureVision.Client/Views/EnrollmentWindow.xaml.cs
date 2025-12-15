@@ -483,7 +483,7 @@ public partial class EnrollmentWindow : System.Windows.Window, IDisposable
                 // Create enrollment directory
                 var enrollmentDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "MedSecureVision");
+                    "CXA");
                 
                 Directory.CreateDirectory(enrollmentDir);
 

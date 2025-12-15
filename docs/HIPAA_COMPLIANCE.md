@@ -1,8 +1,8 @@
-# MedSecure Vision - HIPAA Compliance Documentation
+# CXA - HIPAA Compliance Documentation
 
 ## Overview
 
-MedSecure Vision is designed to comply with HIPAA (Health Insurance Portability and Accountability Act) requirements for protecting Protected Health Information (PHI) in healthcare environments.
+CXA is designed to comply with HIPAA (Health Insurance Portability and Accountability Act) requirements for protecting Protected Health Information (PHI) in healthcare environments.
 
 ## Technical Safeguards Implementation
 
@@ -146,7 +146,7 @@ MedSecure Vision is designed to comply with HIPAA (Health Insurance Portability 
 
 ### Special Considerations
 
-Biometric data (face templates) are considered PHI when linked to health records. MedSecure Vision implements:
+Biometric data (face templates) are considered PHI when linked to health records. CXA implements:
 
 1. **Separate Storage:** Face templates stored separately from patient identifiers
 2. **One-Way Transformation:** Cannot recreate face from template

@@ -1,8 +1,8 @@
-# MedSecure Vision - Module Documentation
+# CXA - Module Documentation
 
 <div align="center">
 
-![MedSecure Vision](https://img.shields.io/badge/MedSecure-Vision-blue?style=for-the-badge)
+![CXA](https://img.shields.io/badge/CXA-R1M1-blue?style=for-the-badge)
 ![Documentation](https://img.shields.io/badge/Docs-Complete-green?style=for-the-badge)
 
 **Comprehensive Technical Documentation for All Core Modules**
@@ -39,7 +39,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                    MedSecure Vision Architecture                     │
+│                    CXA Architecture                     │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
 │  ┌─────────────────────────────────────────────────────────────┐    │
@@ -116,11 +116,11 @@
 
 <div align="center">
 
-**MedSecure Vision** - HIPAA-Compliant Biometric Authentication
+**CXA** - HIPAA-Compliant Biometric Authentication
 
 *Technical Documentation for Healthcare IT Professionals*
 
-*© 2024 MedSecure Vision. All rights reserved.*
+*© 2024 CXA. All rights reserved.*
 
 </div>
 

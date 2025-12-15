@@ -1,4 +1,4 @@
-# MedSecure Vision - API Reference
+# CXA - API Reference
 
 ## Base URL
 

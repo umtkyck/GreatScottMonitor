@@ -163,7 +163,7 @@ public static class AppConstants
     /// <summary>
     /// Application data folder name.
     /// </summary>
-    public const string AppDataFolderName = "MedSecureVision";
+    public const string AppDataFolderName = "CXA";
 
     #endregion
 
@@ -201,7 +201,7 @@ public static class AppConstants
     /// <summary>
     /// Default named pipe name for face service.
     /// </summary>
-    public const string DefaultPipeName = @"\\.\pipe\MedSecureFaceService";
+    public const string DefaultPipeName = @"\\.\pipe\CXAFaceService";
 
     /// <summary>
     /// Default IPC timeout in milliseconds.
@@ -225,7 +225,7 @@ public static class AppConstants
     /// <summary>
     /// Mutex name for single instance enforcement.
     /// </summary>
-    public const string SingleInstanceMutexName = "MedSecureVision_SingleInstance_Mutex";
+    public const string SingleInstanceMutexName = "CXA_SingleInstance_Mutex";
 
     #endregion
 }

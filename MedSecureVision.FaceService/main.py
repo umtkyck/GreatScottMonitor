@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MedSecure Vision - Face Service
+CXA - Face Service
 Main entry point for Python face detection and recognition service
 """
 
@@ -28,7 +28,7 @@ class FaceService:
         self.face_detector = FaceDetector()
         self.face_recognizer = FaceRecognizer()
         self.ipc_server = IpcServer(
-            pipe_name=r'\\.\pipe\MedSecureFaceService',
+            pipe_name=r'\\.\pipe\CXAFaceService',
             face_detector=self.face_detector,
             face_recognizer=self.face_recognizer
         )

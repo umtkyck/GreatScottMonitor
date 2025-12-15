@@ -27,10 +27,9 @@ CXA is a secure biometric authentication system that provides Apple Face ID-like
 
 ### Backend Setup
 
-1. Update `MedSecureVision.Backend/appsettings.json` with your Auth0 and database credentials
+1. Update `appsettings.json` in the Backend project with your Auth0 and database credentials
 2. Run database migrations:
    ```bash
-   cd MedSecureVision.Backend
    dotnet ef database update
    ```
 3. Start the backend:
@@ -42,7 +41,6 @@ CXA is a secure biometric authentication system that provides Apple Face ID-like
 
 1. Install Python dependencies:
    ```bash
-   cd MedSecureVision.FaceService
    pip install -r requirements.txt
    ```
 2. Download InsightFace models (buffalo_l) on first run
@@ -53,10 +51,9 @@ CXA is a secure biometric authentication system that provides Apple Face ID-like
 
 ### Client Setup
 
-1. Update `MedSecureVision.Client/appsettings.json` with backend API URL
+1. Update `appsettings.json` in the Client project with backend API URL
 2. Build and run:
    ```bash
-   cd MedSecureVision.Client
    dotnet build
    dotnet run
    ```
@@ -66,15 +63,8 @@ CXA is a secure biometric authentication system that provides Apple Face ID-like
 See `docs/` directory for detailed documentation:
 - Architecture overview
 - Deployment guide
-- HIPAA compliance documentation
 - API reference
 
 ## License
 
 Proprietary - All rights reserved
-
-
-
-
-
-

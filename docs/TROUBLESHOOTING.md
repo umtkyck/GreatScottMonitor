@@ -1,4 +1,4 @@
-# MedSecure Vision - Troubleshooting Guide
+# CXA - Troubleshooting Guide
 
 ## Common Issues and Solutions
 
@@ -91,7 +91,7 @@
 3. **Check Windows Permissions**
    - Settings → Privacy → Camera
    - Enable "Allow apps to access your camera"
-   - Enable for MedSecure Vision specifically
+   - Enable for CXA specifically
 
 4. **Update Drivers**
    - Device Manager → Cameras

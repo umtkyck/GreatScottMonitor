@@ -28,7 +28,7 @@ class IpcServer:
         Initialize IPC server
         
         Args:
-            pipe_name: Named pipe name (e.g., r'\\.\pipe\MedSecureFaceService')
+            pipe_name: Named pipe name (e.g., r'\\.\pipe\CXAFaceService')
             face_detector: FaceDetector instance
             face_recognizer: FaceRecognizer instance
         """

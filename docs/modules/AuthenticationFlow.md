@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![MedSecure Vision](https://img.shields.io/badge/MedSecure-Vision-blue?style=for-the-badge)
+![CXA](https://img.shields.io/badge/CXA-R1M1-blue?style=for-the-badge)
 ![HIPAA](https://img.shields.io/badge/HIPAA-Compliant-green?style=for-the-badge)
 ![OAuth 2.0](https://img.shields.io/badge/OAuth-2.0-orange?style=for-the-badge)
 
@@ -25,7 +25,7 @@
 
 ## Overview
 
-MedSecure Vision implements a multi-layered authentication system that combines:
+CXA implements a multi-layered authentication system that combines:
 
 1. **Biometric Authentication** - Primary facial recognition
 2. **Cloud Identity** - OAuth 2.0 via Auth0
@@ -389,11 +389,11 @@ Every authentication event is logged:
 
 <div align="center">
 
-**MedSecure Vision** - HIPAA-Compliant Biometric Authentication
+**CXA** - HIPAA-Compliant Biometric Authentication
 
 *Seamless Security for Healthcare Professionals*
 
-*© 2024 MedSecure Vision. All rights reserved.*
+*© 2024 CXA. All rights reserved.*
 
 </div>
 

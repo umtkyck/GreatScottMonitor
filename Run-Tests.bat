@@ -1,15 +1,15 @@
 @echo off
 :: ============================================================================
-:: MedSecure Vision - Run Unit Tests
+:: CXA - Run Unit Tests
 :: ============================================================================
-:: Runs all unit tests for the MedSecure Vision solution
+:: Runs all unit tests for the CXA solution
 :: ============================================================================
 
-title MedSecure Vision - Running Tests
+title CXA - Running Tests
 
 echo.
 echo  ========================================================
-echo   MedSecure Vision - Unit Tests
+echo   CXA - Unit Tests
 echo  ========================================================
 echo.
 
@@ -30,9 +30,3 @@ if %ERRORLEVEL% equ 0 (
 )
 echo.
 pause
-
-
-
-
-
-

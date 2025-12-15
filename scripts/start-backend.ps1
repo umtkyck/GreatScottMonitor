@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Start MedSecure Vision Backend API
+    Start CXA Backend API
     
 .DESCRIPTION
-    Starts the ASP.NET Core backend API server for MedSecure Vision.
+    Starts the ASP.NET Core backend API server for CXA.
     
 .PARAMETER Port
     Port number to run on (default: 5001)
@@ -30,7 +30,7 @@ $BackendDir = Join-Path $ProjectRoot "MedSecureVision.Backend"
 Write-Host @"
 
 ╔══════════════════════════════════════════════════════════════╗
-║           MedSecure Vision - Backend API Server              ║
+║           CXA - Backend API Server                           ║
 ╚══════════════════════════════════════════════════════════════╝
 
 "@ -ForegroundColor Cyan

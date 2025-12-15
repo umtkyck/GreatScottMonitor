@@ -1,4 +1,4 @@
-# MedSecure Vision - Quick Reference Guide
+# CXA - Quick Reference Guide
 
 ## For End Users
 

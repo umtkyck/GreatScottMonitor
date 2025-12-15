@@ -1,4 +1,4 @@
-# MedSecure Vision - User Guide
+# CXA - User Guide
 
 ## Table of Contents
 
@@ -11,7 +11,7 @@
 
 ## Introduction
 
-MedSecure Vision is a biometric authentication system that uses facial recognition to secure your workstation. It provides:
+CXA is a biometric authentication system that uses facial recognition to secure your workstation. It provides:
 
 - **Fast Authentication**: Unlock your computer in under 500ms using your face
 - **Automatic Locking**: Your session locks automatically when you leave your desk
@@ -23,7 +23,7 @@ MedSecure Vision is a biometric authentication system that uses facial recogniti
 ### First-Time Setup
 
 1. **Launch the Application**
-   - The MedSecure Vision client should start automatically when you log in
+   - The CXA client should start automatically when you log in
    - Look for the green shield icon in your system tray
 
 2. **Initial Authentication**
@@ -126,7 +126,7 @@ If face recognition fails, you can use alternative methods:
 
 ### How It Works
 
-Once authenticated, MedSecure Vision continuously monitors your presence:
+Once authenticated, CXA continuously monitors your presence:
 
 - **Check Interval**: Every 200ms (5 times per second)
 - **Absence Timeout**: Default 5 seconds (configurable by administrator)

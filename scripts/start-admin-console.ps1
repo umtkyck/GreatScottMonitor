@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Start MedSecure Vision Admin Console
+    Start CXA Admin Console
     
 .DESCRIPTION
     Starts the React Admin Console in development mode.
@@ -25,7 +25,7 @@ $AdminDir = Join-Path $ProjectRoot "MedSecureVision.AdminConsole"
 Write-Host @"
 
 ╔══════════════════════════════════════════════════════════════╗
-║         MedSecure Vision - Admin Console (React)             ║
+║         CXA - Admin Console (React)                          ║
 ╚══════════════════════════════════════════════════════════════╝
 
 "@ -ForegroundColor Cyan

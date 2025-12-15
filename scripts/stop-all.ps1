@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Stop All MedSecure Vision Services
+    Stop All CXA Services
     
 .DESCRIPTION
-    Stops all running MedSecure Vision services.
+    Stops all running CXA services.
     
 .EXAMPLE
     .\stop-all.ps1
@@ -12,7 +12,7 @@
 Write-Host @"
 
 ╔══════════════════════════════════════════════════════════════╗
-║          Stopping MedSecure Vision Services                  ║
+║          Stopping CXA Services                               ║
 ╚══════════════════════════════════════════════════════════════╝
 
 "@ -ForegroundColor Yellow

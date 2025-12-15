@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![MedSecure Vision](https://img.shields.io/badge/MedSecure-Vision-blue?style=for-the-badge)
+![CXA](https://img.shields.io/badge/CXA-R1M1-blue?style=for-the-badge)
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-purple?style=for-the-badge)
 ![HIPAA](https://img.shields.io/badge/HIPAA-Compliant-green?style=for-the-badge)
 
@@ -378,11 +378,11 @@ private void HandleUnauthorizedFace(float similarity)
 
 <div align="center">
 
-**MedSecure Vision** - HIPAA-Compliant Biometric Authentication
+**CXA** - HIPAA-Compliant Biometric Authentication
 
 *Protecting Patient Data Through Continuous Presence Verification*
 
-*© 2024 MedSecure Vision. All rights reserved.*
+*© 2024 CXA. All rights reserved.*
 
 </div>
 

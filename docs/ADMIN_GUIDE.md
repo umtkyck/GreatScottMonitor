@@ -1,4 +1,4 @@
-# MedSecure Vision - Administrator Guide
+# CXA - Administrator Guide
 
 ## Table of Contents
 
@@ -13,7 +13,7 @@
 
 ## Overview
 
-This guide is for system administrators responsible for deploying, configuring, and maintaining MedSecure Vision in a healthcare environment.
+This guide is for system administrators responsible for deploying, configuring, and maintaining CXA in a healthcare environment.
 
 ### Key Responsibilities
 
@@ -66,7 +66,7 @@ Edit `MedSecureVision.Client/appsettings.json`:
 ```json
 {
   "FaceService": {
-    "PipeName": "\\\\.\\pipe\\MedSecureFaceService"
+    "PipeName": "\\\\.\\pipe\\CXAFaceService"
   },
   "BackendApi": {
     "BaseUrl": "https://api.medsecurevision.com"
@@ -424,7 +424,7 @@ Monitor for:
 
 ### HIPAA Requirements
 
-MedSecure Vision implements HIPAA technical safeguards:
+CXA implements HIPAA technical safeguards:
 - Access Control (§164.312(a)(1))
 - Audit Controls (§164.312(b))
 - Integrity (§164.312(c)(1))

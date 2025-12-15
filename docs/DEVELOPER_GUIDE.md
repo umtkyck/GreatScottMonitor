@@ -1,4 +1,4 @@
-# MedSecure Vision - Developer Guide
+# CXA - Developer Guide
 
 ## Table of Contents
 

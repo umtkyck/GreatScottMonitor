@@ -1,4 +1,4 @@
-# MedSecure Vision - Deployment Guide
+# CXA - Deployment Guide
 
 ## Prerequisites
 
@@ -77,7 +77,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-The service will create a named pipe at `\\.\pipe\MedSecureFaceService`
+The service will create a named pipe at `\\.\pipe\CXAFaceService`
 
 ## Client Deployment
 

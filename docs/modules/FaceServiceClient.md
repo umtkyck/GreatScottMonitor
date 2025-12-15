@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![MedSecure Vision](https://img.shields.io/badge/MedSecure-Vision-blue?style=for-the-badge)
+![CXA](https://img.shields.io/badge/CXA-R1M1-blue?style=for-the-badge)
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-purple?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Production-green?style=for-the-badge)
 
@@ -62,7 +62,7 @@ The `FaceServiceClient` class provides a robust communication interface between 
 │                   └──────┬──────┘                                │
 └──────────────────────────┼──────────────────────────────────────┘
                            │
-              \\.\pipe\MedSecureFaceService
+              \\.\pipe\CXAFaceService
                            │
 ┌──────────────────────────┼──────────────────────────────────────┐
 │                   Python Face Service                            │
@@ -217,7 +217,7 @@ public async Task<bool> IsConnectedAsync()
 ```csharp
 public class FaceServiceOptions
 {
-    public string? PipeName { get; set; } = @"\\.\pipe\MedSecureFaceService";
+    public string? PipeName { get; set; } = @"\\.\pipe\CXAFaceService";
 }
 ```
 
@@ -297,9 +297,9 @@ public class FaceDetectionResult
 
 <div align="center">
 
-**MedSecure Vision** - HIPAA-Compliant Biometric Authentication
+**CXA** - HIPAA-Compliant Biometric Authentication
 
-*© 2024 MedSecure Vision. All rights reserved.*
+*© 2024 CXA. All rights reserved.*
 
 </div>
 

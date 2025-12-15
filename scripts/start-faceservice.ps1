@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Start MedSecure Vision Python Face Service
+    Start CXA Python Face Service
     
 .DESCRIPTION
     Starts the Python face detection and recognition service.
@@ -27,7 +27,7 @@ $VenvDir = Join-Path $FaceServiceDir "venv"
 Write-Host @"
 
 ╔══════════════════════════════════════════════════════════════╗
-║         MedSecure Vision - Python Face Service               ║
+║         CXA - Python Face Service                            ║
 ╚══════════════════════════════════════════════════════════════╝
 
 "@ -ForegroundColor Cyan
@@ -63,7 +63,7 @@ if ($InstallDeps) {
 # Start the face service
 Write-Host ""
 Write-Host "[INFO] Starting Face Service..." -ForegroundColor Green
-Write-Host "[INFO] Named Pipe: \\.\pipe\MedSecureFaceService" -ForegroundColor Green
+Write-Host "[INFO] Named Pipe: \\.\pipe\CXAFaceService" -ForegroundColor Green
 Write-Host "[INFO] Press Ctrl+C to stop" -ForegroundColor Yellow
 Write-Host ""
 

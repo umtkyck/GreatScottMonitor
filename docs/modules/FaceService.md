@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![MedSecure Vision](https://img.shields.io/badge/MedSecure-Vision-blue?style=for-the-badge)
+![CXA](https://img.shields.io/badge/CXA-R1M1-blue?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10+-yellow?style=for-the-badge)
 ![MediaPipe](https://img.shields.io/badge/MediaPipe-BlazeFace-orange?style=for-the-badge)
 ![InsightFace](https://img.shields.io/badge/InsightFace-ArcFace-red?style=for-the-badge)
@@ -27,7 +27,7 @@
 
 ## Overview
 
-The Python Face Service is the core biometric processing engine of MedSecure Vision. It provides:
+The Python Face Service is the core biometric processing engine of CXA. It provides:
 
 - **Real-time face detection** using MediaPipe BlazeFace
 - **Face recognition** using InsightFace ArcFace model
@@ -168,7 +168,7 @@ class IpcServer:
 **Pipe Configuration:**
 | Parameter | Value |
 |-----------|-------|
-| Pipe Name | `\\.\pipe\MedSecureFaceService` |
+| Pipe Name | `\\.\pipe\CXAFaceService` |
 | Mode | Duplex (bidirectional) |
 | Type | Message |
 | Buffer Size | 65536 bytes |
@@ -396,11 +396,11 @@ python main.py > face_service.log 2>&1
 
 <div align="center">
 
-**MedSecure Vision** - HIPAA-Compliant Biometric Authentication
+**CXA** - HIPAA-Compliant Biometric Authentication
 
 *Powered by MediaPipe and InsightFace*
 
-*© 2024 MedSecure Vision. All rights reserved.*
+*© 2024 CXA. All rights reserved.*
 
 </div>
 

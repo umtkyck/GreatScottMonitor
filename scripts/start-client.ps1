@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Start MedSecure Vision WPF Client
+    Start CXA WPF Client
     
 .DESCRIPTION
     Builds and starts the WPF client application.
@@ -31,7 +31,7 @@ $ClientDir = Join-Path $ProjectRoot "MedSecureVision.Client"
 Write-Host @"
 
 ╔══════════════════════════════════════════════════════════════╗
-║           MedSecure Vision - WPF Client Application          ║
+║           CXA - WPF Client Application                       ║
 ╚══════════════════════════════════════════════════════════════╝
 
 "@ -ForegroundColor Cyan

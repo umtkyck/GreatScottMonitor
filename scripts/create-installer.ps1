@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Create MedSecure Vision Installer Package
+    Create CXA Installer Package
     
 .DESCRIPTION
     Creates a deployment package with all required files for installation.
@@ -28,13 +28,13 @@ $ProjectRoot = Split-Path -Parent $ScriptRoot
 Write-Host @"
 
 ╔══════════════════════════════════════════════════════════════╗
-║       MedSecure Vision - Installer Package Creator           ║
+║       CXA - Installer Package Creator                        ║
 ╚══════════════════════════════════════════════════════════════╝
 
 "@ -ForegroundColor Cyan
 
 $InstallerDir = Join-Path $ProjectRoot $OutputDir
-$PackageDir = Join-Path $InstallerDir "MedSecureVision-$Version"
+$PackageDir = Join-Path $InstallerDir "CXA-$Version"
 
 # Clean and create directories
 if (Test-Path $PackageDir) {
@@ -61,10 +61,10 @@ Write-Host "[INFO] Creating startup scripts..." -ForegroundColor Yellow
 # Install script
 @"
 @echo off
-title MedSecure Vision - Installation
+title CXA - Installation
 echo.
 echo  ========================================================
-echo   MedSecure Vision Installation
+echo   CXA Installation
 echo   Version: $Version
 echo  ========================================================
 echo.
@@ -109,7 +109,7 @@ echo   1. Configure Backend\appsettings.json with your database
 echo   2. Configure Client\appsettings.json with API URL
 echo   3. Run Setup-Database.bat to initialize database
 echo.
-echo   To start: Run Start-MedSecure.bat
+echo   To start: Run Start-CXA.bat
 echo.
 pause
 "@ | Out-File -FilePath "$PackageDir\Install.bat" -Encoding ASCII
@@ -117,28 +117,28 @@ pause
 # Start script
 @"
 @echo off
-title MedSecure Vision
-echo Starting MedSecure Vision...
+title CXA
+echo Starting CXA...
 start "Backend" cmd /k "cd /d %~dp0Backend && dotnet MedSecureVision.Backend.dll"
 timeout /t 3 /nobreak > nul
 start "FaceService" cmd /k "cd /d %~dp0FaceService && venv\Scripts\python.exe main.py"
 timeout /t 5 /nobreak > nul
 start "" "%~dp0Client\MedSecureVision.Client.exe"
 echo All services started!
-"@ | Out-File -FilePath "$PackageDir\Start-MedSecure.bat" -Encoding ASCII
+"@ | Out-File -FilePath "$PackageDir\Start-CXA.bat" -Encoding ASCII
 
 # Stop script
 @"
 @echo off
-echo Stopping MedSecure Vision...
+echo Stopping CXA...
 taskkill /IM "MedSecureVision.Client.exe" /F 2>nul
 taskkill /IM "MedSecureVision.Backend.exe" /F 2>nul
 taskkill /IM "python.exe" /F 2>nul
 echo Done.
-"@ | Out-File -FilePath "$PackageDir\Stop-MedSecure.bat" -Encoding ASCII
+"@ | Out-File -FilePath "$PackageDir\Stop-CXA.bat" -Encoding ASCII
 
 Write-Host "[INFO] Creating ZIP archive..." -ForegroundColor Yellow
-$ZipPath = "$InstallerDir\MedSecureVision-$Version.zip"
+$ZipPath = "$InstallerDir\CXA-$Version.zip"
 if (Test-Path $ZipPath) { Remove-Item $ZipPath }
 Compress-Archive -Path $PackageDir -DestinationPath $ZipPath
 

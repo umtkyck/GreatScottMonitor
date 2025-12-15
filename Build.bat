@@ -1,16 +1,16 @@
 @echo off
 :: ============================================================================
-:: MedSecure Vision - Quick Build Script
+:: CXA - Quick Build Script
 :: ============================================================================
-:: This script builds the entire MedSecure Vision solution
+:: This script builds the entire CXA solution
 :: For more options, use scripts\build-all.ps1
 :: ============================================================================
 
-title MedSecure Vision - Build
+title CXA - Build
 
 echo.
 echo  ========================================================
-echo   MedSecure Vision - Build Script
+echo   CXA - Build Script
 echo  ========================================================
 echo.
 
@@ -39,9 +39,3 @@ echo.
 echo  To start all services, run: Start-All.bat
 echo.
 pause
-
-
-
-
-
-

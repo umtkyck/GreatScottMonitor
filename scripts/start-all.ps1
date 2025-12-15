@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Start All MedSecure Vision Services
+    Start All CXA Services
     
 .DESCRIPTION
-    Starts all MedSecure Vision services in the correct order:
+    Starts all CXA services in the correct order:
     1. Backend API (ASP.NET Core)
     2. Face Service (Python)
     3. Client Application (WPF)
@@ -31,14 +31,15 @@ $ProjectRoot = Split-Path -Parent $ScriptRoot
 
 Write-Host @"
 
-    __  __          _ ____                          _    ___      _             
-   |  \/  | ___  __| / ___|  ___  ___ _   _ _ __ __| |  / _ \    (_)___ ___ ___ 
-   | |\/| |/ _ \/ _` \___ \ / _ \/ __| | | | '__/ _` | | | | |   | / __/ __/ _ \
-   | |  | |  __/ (_| |___) |  __/ (__| |_| | | | (_| | | |_| |   | \__ \__ \  __/
-   |_|  |_|\___|\__,_|____/ \___|\___|\__,_|_|  \__,_|  \___/    |_|___/___/\___|
+     ██████╗██╗  ██╗ █████╗ 
+    ██╔════╝╚██╗██╔╝██╔══██╗
+    ██║      ╚███╔╝ ███████║
+    ██║      ██╔██╗ ██╔══██║
+    ╚██████╗██╔╝ ██╗██║  ██║
+     ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝
                                                                                  
-    HIPAA-Compliant Biometric Authentication System
-    Service Launcher v1.0.0
+    Biometric Authentication System
+    Service Launcher R1M1
 
 "@ -ForegroundColor Cyan
 
@@ -86,7 +87,7 @@ Write-Host @"
 ║                                                               ║
 ║   Backend API:    https://localhost:5001                      ║
 ║   Swagger UI:     https://localhost:5001/swagger              ║
-║   Face Service:   \\.\pipe\MedSecureFaceService               ║
+║   Face Service:   \\.\pipe\CXAFaceService                     ║
 ║   Client:         Running in separate window                  ║
 ║                                                               ║
 ╚══════════════════════════════════════════════════════════════╝

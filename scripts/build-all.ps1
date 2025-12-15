@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    MedSecure Vision - Complete Build Script
+    CXA - Complete Build Script
     
 .DESCRIPTION
-    Builds all components of the MedSecure Vision system:
+    Builds all components of the CXA system:
     - .NET Solution (Client, Backend, Shared, Tests)
     - Python Face Service (virtual environment setup)
     - React Admin Console (npm install and build)
@@ -23,8 +23,8 @@
     .\build-all.ps1 -SkipPython -SkipNode
     
 .NOTES
-    Author: MedSecure Vision Team
-    Version: 1.0.0
+    Author: CXA Team
+    Version: R1M1
     Requires: .NET 8 SDK, Python 3.10+, Node.js 18+
 #>
 
@@ -244,15 +244,15 @@ Write-Header "Creating Startup Scripts"
 # Start All script
 $startAllScript = @'
 @echo off
-echo Starting MedSecure Vision Services...
+echo Starting CXA Services...
 echo.
 
 echo [1/3] Starting Backend API...
-start "MedSecure Backend" cmd /k "cd /d %~dp0Backend && dotnet MedSecureVision.Backend.dll"
+start "CXA Backend" cmd /k "cd /d %~dp0Backend && dotnet MedSecureVision.Backend.dll"
 timeout /t 3 /nobreak > nul
 
 echo [2/3] Starting Face Service...
-start "MedSecure FaceService" cmd /k "cd /d %~dp0FaceService && venv\Scripts\python.exe main.py"
+start "CXA FaceService" cmd /k "cd /d %~dp0FaceService && venv\Scripts\python.exe main.py"
 timeout /t 5 /nobreak > nul
 
 echo [3/3] Starting Client Application...
@@ -268,7 +268,7 @@ $startAllScript | Out-File -FilePath (Join-Path $publishDir "Start-All.bat") -En
 # Stop All script
 $stopAllScript = @'
 @echo off
-echo Stopping MedSecure Vision Services...
+echo Stopping CXA Services...
 taskkill /IM "MedSecureVision.Client.exe" /F 2>nul
 taskkill /IM "MedSecureVision.Backend.exe" /F 2>nul
 taskkill /IM "python.exe" /F 2>nul

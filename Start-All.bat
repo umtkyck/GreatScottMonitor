@@ -1,21 +1,21 @@
 @echo off
 :: ============================================================================
-:: MedSecure Vision - Start All Services
+:: CXA - Start All Services
 :: ============================================================================
-:: Starts all MedSecure Vision services in the correct order
+:: Starts all CXA services in the correct order
 :: ============================================================================
 
-title MedSecure Vision - Starting Services
+title CXA - Starting Services
 
 echo.
 echo  ========================================================
-echo   MedSecure Vision - Starting All Services
+echo   CXA - Starting All Services
 echo  ========================================================
 echo.
 
 :: Start Backend API
 echo [1/3] Starting Backend API...
-start "MedSecure - Backend API" cmd /k "cd /d %~dp0MedSecureVision.Backend && dotnet run"
+start "CXA - Backend API" cmd /k "cd /d %~dp0MedSecureVision.Backend && dotnet run"
 timeout /t 3 /nobreak > nul
 
 :: Start Face Service
@@ -29,7 +29,7 @@ if not exist venv (
 ) else (
     call venv\Scripts\activate.bat
 )
-start "MedSecure - Face Service" cmd /k "cd /d %~dp0MedSecureVision.FaceService && venv\Scripts\python.exe main.py"
+start "CXA - Face Service" cmd /k "cd /d %~dp0MedSecureVision.FaceService && venv\Scripts\python.exe main.py"
 timeout /t 5 /nobreak > nul
 
 :: Start Client
@@ -44,15 +44,9 @@ echo  ========================================================
 echo.
 echo   Backend API:    https://localhost:5001
 echo   Swagger UI:     https://localhost:5001/swagger
-echo   Face Service:   \\.\pipe\MedSecureFaceService
+echo   Face Service:   \\.\pipe\CXAFaceService
 echo   Client:         Running
 echo.
 echo   To stop all services, run: Stop-All.bat
 echo.
 pause
-
-
-
-
-
-

@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![MedSecure Vision](https://img.shields.io/badge/MedSecure-Vision-blue?style=for-the-badge)
+![CXA](https://img.shields.io/badge/CXA-R1M1-blue?style=for-the-badge)
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-purple?style=for-the-badge)
 ![FIPS 140-2](https://img.shields.io/badge/FIPS-140--2-green?style=for-the-badge)
 ![AES-256](https://img.shields.io/badge/AES-256--GCM-red?style=for-the-badge)
@@ -372,11 +372,11 @@ public async Task Decrypt_WrongUserId_ThrowsException()
 
 <div align="center">
 
-**MedSecure Vision** - HIPAA-Compliant Biometric Authentication
+**CXA** - HIPAA-Compliant Biometric Authentication
 
 *Protecting Biometric Data with Military-Grade Encryption*
 
-*© 2024 MedSecure Vision. All rights reserved.*
+*© 2024 CXA. All rights reserved.*
 
 </div>
 
