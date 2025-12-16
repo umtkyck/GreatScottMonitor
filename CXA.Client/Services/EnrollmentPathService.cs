@@ -120,8 +120,9 @@ public class EnrollmentPathService : IEnrollmentPathService
             }
             return false;
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Delete primary enrollment failed: {ex.Message}");
             return false;
         }
     }
@@ -144,8 +145,9 @@ public class EnrollmentPathService : IEnrollmentPathService
             }
             return false;
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Delete face '{faceId}' failed: {ex.Message}");
             return false;
         }
     }

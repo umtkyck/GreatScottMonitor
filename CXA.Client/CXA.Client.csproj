@@ -10,14 +10,14 @@
     <AssemblyName>CXA.Client</AssemblyName>
     <RootNamespace>CXA.Client</RootNamespace>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <InformationalVersion>R1M1</InformationalVersion>
+    <Version>1.0.1</Version>
+    <FileVersion>1.0.1.0</FileVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <InformationalVersion>R1M1-Release</InformationalVersion>
     <Company>CXA</Company>
     <Product>CXA - Biometric Authentication</Product>
-    <Description>Secure facial recognition authentication system</Description>
-    <Copyright>Copyright © 2024 CXA</Copyright>
+    <Description>Secure facial recognition authentication system with Face ID-style enrollment</Description>
+    <Copyright>Copyright © 2025 CXA</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

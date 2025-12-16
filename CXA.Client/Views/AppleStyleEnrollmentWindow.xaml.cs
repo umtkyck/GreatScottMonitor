@@ -134,9 +134,10 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignore individual frame capture errors to maintain smooth operation
+            // Log but don't interrupt - individual frame errors shouldn't stop the feed
+            System.Diagnostics.Debug.WriteLine($"Frame capture error: {ex.Message}");
         }
     }
 
@@ -151,7 +152,7 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
 
         _scanTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(50) // Update 20 times per second
+            Interval = TimeSpan.FromMilliseconds(AppConstants.ScanProgressUpdateIntervalMs)
         };
         _scanTimer.Tick += OnScanTick;
         _scanTimer.Start();
@@ -168,17 +169,15 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
         var elapsed = (DateTime.Now - _scanStartTime).TotalSeconds;
         _scanProgress = Math.Min((elapsed / AppConstants.EnrollmentScanDurationSeconds) * 100, 100);
 
-        // Update progress ring
         UpdateProgressRing(_scanProgress);
         UpdateProgressBar();
 
-        // Capture frames at intervals
-        if (_scanProgress > 0 && (int)_scanProgress % 12 == 0)
+        // Capture frames at regular intervals
+        if (_scanProgress > 0 && (int)_scanProgress % AppConstants.FrameCaptureProgressInterval == 0)
         {
             CaptureCurrentFrame();
         }
 
-        // Check if scan complete
         if (_scanProgress >= 100)
         {
             CompleteScan();
@@ -187,7 +186,6 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
 
     private void UpdateProgressRing(double progress)
     {
-        // Create arc path based on progress (0-100)
         double angle = (progress / 100.0) * 360;
         
         if (angle <= 0)
@@ -196,32 +194,34 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
             return;
         }
 
-        double radius = 140;
-        double centerX = 140;
-        double centerY = 140;
-
-        double startAngle = -90; // Start from top
+        const double radius = AppConstants.EnrollmentProgressRadius;
+        const double center = AppConstants.EnrollmentProgressRadius;
+        const double startAngle = -90; // Start from top (12 o'clock position)
+        
         double endAngle = startAngle + angle;
-
         double startRad = startAngle * Math.PI / 180;
         double endRad = endAngle * Math.PI / 180;
 
-        double x1 = centerX + radius * Math.Cos(startRad);
-        double y1 = centerY + radius * Math.Sin(startRad);
-        double x2 = centerX + radius * Math.Cos(endRad);
-        double y2 = centerY + radius * Math.Sin(endRad);
+        double x1 = center + radius * Math.Cos(startRad);
+        double y1 = center + radius * Math.Sin(startRad);
+        double x2 = center + radius * Math.Cos(endRad);
+        double y2 = center + radius * Math.Sin(endRad);
 
         bool largeArc = angle > 180;
+        var culture = System.Globalization.CultureInfo.InvariantCulture;
 
-        string pathData = $"M {x1.ToString(System.Globalization.CultureInfo.InvariantCulture)},{y1.ToString(System.Globalization.CultureInfo.InvariantCulture)} " +
-                         $"A {radius.ToString(System.Globalization.CultureInfo.InvariantCulture)},{radius.ToString(System.Globalization.CultureInfo.InvariantCulture)} 0 {(largeArc ? 1 : 0)} 1 " +
-                         $"{x2.ToString(System.Globalization.CultureInfo.InvariantCulture)},{y2.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+        string pathData = string.Format(culture,
+            "M {0},{1} A {2},{2} 0 {3} 1 {4},{5}",
+            x1, y1, radius, largeArc ? 1 : 0, x2, y2);
 
         try
         {
             ProgressArc.Data = Geometry.Parse(pathData);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Progress ring parse error: {ex.Message}");
+        }
     }
 
     private void UpdateProgressBar()
@@ -245,13 +245,16 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
 
         if (_currentScan == 0)
         {
-            // First scan complete
+            // First scan complete - prepare for second scan
             _currentScan = 1;
             _currentPhase = EnrollmentPhase.SecondScan;
             UpdateUI();
 
-            // Brief pause then start second scan
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            // Brief pause before starting second scan
+            var timer = new DispatcherTimer 
+            { 
+                Interval = TimeSpan.FromSeconds(AppConstants.InterScanDelaySeconds) 
+            };
             timer.Tick += (s, e) =>
             {
                 timer.Stop();
@@ -261,7 +264,7 @@ public partial class AppleStyleEnrollmentWindow : System.Windows.Window, IDispos
         }
         else
         {
-            // Both scans complete
+            // Both scans complete - finalize enrollment
             _currentPhase = EnrollmentPhase.Complete;
             UpdateUI();
             PlaySuccessAnimation();
@@ -417,8 +420,4 @@ public enum EnrollmentPhase
     SecondScan,
     Complete
 }
-
-
-
-
 

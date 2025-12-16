@@ -91,10 +91,13 @@
 
                     <!-- Window Controls -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
-                        <Button Style="{StaticResource IconButton}" Click="MinimizeButton_Click" Width="32" Height="32">
+                        <Button Style="{StaticResource IconButton}" Click="MinimizeButton_Click" Width="32" Height="32" ToolTip="Minimize">
                             <TextBlock Text="─" FontSize="12" Foreground="#8B949E"/>
                         </Button>
-                        <Button Style="{StaticResource IconButton}" Click="CloseButton_Click" Width="32" Height="32">
+                        <Button x:Name="MaximizeButton" Style="{StaticResource IconButton}" Click="MaximizeButton_Click" Width="32" Height="32" ToolTip="Maximize">
+                            <TextBlock x:Name="MaximizeIcon" Text="☐" FontSize="14" Foreground="#8B949E"/>
+                        </Button>
+                        <Button Style="{StaticResource IconButton}" Click="CloseButton_Click" Width="32" Height="32" ToolTip="Close to Tray">
                             <TextBlock Text="✕" FontSize="12" Foreground="#8B949E"/>
                         </Button>
                     </StackPanel>
@@ -321,6 +324,51 @@
             </Grid>
 
             <!-- ═══════════════════════════════════════════════════════════════
+                 LOCK OVERLAY - Shows when not authenticated
+            ═══════════════════════════════════════════════════════════════ -->
+            <Grid x:Name="LockOverlay" Grid.RowSpan="3" Visibility="Collapsed" Panel.ZIndex="100">
+                <Border Background="#E5000000"/>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <!-- Lock Icon with Pulse Animation -->
+                    <Border x:Name="LockIconBorder" Width="120" Height="120" CornerRadius="60" Margin="0,0,0,30">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#F85149" Offset="0"/>
+                                <GradientStop Color="#DA3633" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="40" ShadowDepth="0" Color="#F85149" Opacity="0.5"/>
+                        </Border.Effect>
+                        <TextBlock Text="🔒" FontSize="48" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    
+                    <TextBlock x:Name="LockTitle" Text="Screen Locked" FontSize="32" FontWeight="Bold" 
+                               Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                    <TextBlock x:Name="LockMessage" Text="Show your face to unlock" FontSize="16" 
+                               Foreground="#8B949E" HorizontalAlignment="Center" Margin="0,0,0,40"/>
+                    
+                    <!-- Small Camera Preview -->
+                    <Border Width="160" Height="160" CornerRadius="80" BorderBrush="#30363D" BorderThickness="3">
+                        <Border.Background>
+                            <ImageBrush x:Name="LockCameraFeed" Stretch="UniformToFill"/>
+                        </Border.Background>
+                        <Grid x:Name="LockNoCameraPlaceholder" Visibility="Collapsed">
+                            <Ellipse Fill="#21262D"/>
+                            <TextBlock Text="📷" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.3"/>
+                        </Grid>
+                    </Border>
+                    
+                    <TextBlock x:Name="LockStatus" Text="Looking for face..." FontSize="13" 
+                               Foreground="#8B949E" HorizontalAlignment="Center" Margin="0,16,0,0"/>
+                    
+                    <!-- PIN Fallback Button -->
+                    <Button Content="🔑 Use PIN Instead" Style="{StaticResource ModernButton}" 
+                            Margin="0,30,0,0" Padding="24,12" Click="LockPinButton_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- ═══════════════════════════════════════════════════════════════
                  FOOTER
             ═══════════════════════════════════════════════════════════════ -->
             <Border Grid.Row="2" Background="#0D1117" BorderBrush="#21262D" BorderThickness="0,1,0,0">
@@ -331,7 +379,7 @@
                     </StackPanel>
                     <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="11" Foreground="#484F58">
                         <Run Text="CXA v"/>
-                        <Run x:Name="VersionText" Text="R1M1"/>
+                        <Run x:Name="VersionText" Text="R1M1-Release"/>
                     </TextBlock>
                 </Grid>
             </Border>

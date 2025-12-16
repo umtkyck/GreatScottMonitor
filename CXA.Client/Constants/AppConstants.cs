@@ -1,3 +1,4 @@
+using System.Windows.Media;
 using Color = System.Windows.Media.Color;
 
 namespace CXA.Client.Constants;
@@ -8,12 +9,39 @@ namespace CXA.Client.Constants;
 /// </summary>
 public static class AppConstants
 {
+    #region Color Helper Methods
+
+    /// <summary>
+    /// Creates a SolidColorBrush from a Color constant.
+    /// </summary>
+    public static SolidColorBrush CreateBrush(Color color) => new(color);
+
+    /// <summary>
+    /// Creates a RadialGradientBrush for camera glow effects.
+    /// </summary>
+    /// <param name="color">The glow color.</param>
+    /// <param name="innerOpacity">Opacity at center (0-255).</param>
+    /// <returns>A configured RadialGradientBrush.</returns>
+    public static RadialGradientBrush CreateGlowBrush(Color color, byte innerOpacity = 0x40)
+    {
+        return new RadialGradientBrush
+        {
+            GradientStops = new GradientStopCollection
+            {
+                new GradientStop(Color.FromArgb(innerOpacity, color.R, color.G, color.B), 0.7),
+                new GradientStop(Color.FromArgb(0x00, color.R, color.G, color.B), 1.0)
+            }
+        };
+    }
+
+    #endregion
+
     #region Version Information
 
     /// <summary>
-    /// Current application version (Release 1, Milestone 1).
+    /// Current application version (Release 1, Milestone 1 - Release Build).
     /// </summary>
-    public const string AppVersion = "R1M1";
+    public const string AppVersion = "R1M1-Release";
 
     /// <summary>
     /// Application name displayed in UI.
@@ -226,6 +254,79 @@ public static class AppConstants
     /// Mutex name for single instance enforcement.
     /// </summary>
     public const string SingleInstanceMutexName = "CXA_SingleInstance_Mutex";
+
+    #endregion
+
+    #region Lock Screen Configuration
+
+    /// <summary>
+    /// Seconds without face before locking screen.
+    /// </summary>
+    public const int LockTimeoutSeconds = 2;
+
+    /// <summary>
+    /// Milliseconds between lock timer checks.
+    /// </summary>
+    public const int LockTimerIntervalMs = 500;
+
+    /// <summary>
+    /// Frame count threshold before reporting "no face".
+    /// </summary>
+    public const int NoFaceFrameThreshold = 5;
+
+    #endregion
+
+    #region Enrollment UI Configuration
+
+    /// <summary>
+    /// Radius of the enrollment progress circle.
+    /// </summary>
+    public const double EnrollmentProgressRadius = 140;
+
+    /// <summary>
+    /// Milliseconds between scan progress updates.
+    /// </summary>
+    public const int ScanProgressUpdateIntervalMs = 50;
+
+    /// <summary>
+    /// Progress percentage interval for frame capture.
+    /// </summary>
+    public const int FrameCaptureProgressInterval = 12;
+
+    /// <summary>
+    /// Delay between scan phases in seconds.
+    /// </summary>
+    public const double InterScanDelaySeconds = 1.0;
+
+    #endregion
+
+    #region Cascade Classifier
+
+    /// <summary>
+    /// Haar cascade file name for face detection.
+    /// </summary>
+    public const string HaarCascadeFileName = "haarcascade_frontalface_default.xml";
+
+    /// <summary>
+    /// URL for downloading Haar cascade file.
+    /// </summary>
+    public const string HaarCascadeDownloadUrl = 
+        "https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml";
+
+    /// <summary>
+    /// Minimum face size for detection in pixels.
+    /// </summary>
+    public const int MinDetectionFaceSize = 80;
+
+    /// <summary>
+    /// Scale factor for cascade detection.
+    /// </summary>
+    public const double CascadeScaleFactor = 1.1;
+
+    /// <summary>
+    /// Minimum neighbors for cascade detection.
+    /// </summary>
+    public const int CascadeMinNeighbors = 4;
 
     #endregion
 }
